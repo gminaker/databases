@@ -102,8 +102,8 @@ create table returnitem
  
 -- grant select on returnitem to public;
  
-create unique index pubind on publishers
-(pub_id);
+--create unique index pubind on publishers
+--(pub_id);
  
 create unique index auidind 
 on authors (au_id);
