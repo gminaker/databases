@@ -22,6 +22,8 @@
 // TODO: update connection credentials 
 $connection = new mysqli("localhost", "root", "", "amsstore");
 
+printf ("System status: %s\n", $connection->stat());
+
 // Check that the connection was successful, otherwise exit
 if (mysqli_connect_errno()) {
     printf("Connect failed: %s\n", mysqli_connect_error());
