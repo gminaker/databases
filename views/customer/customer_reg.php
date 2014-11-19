@@ -123,19 +123,19 @@ function insertIntoDB($name, $addr, $tel, $id, $pass){
 	 <table>
 		 <tr>
 		 	<td>Name:</td>
-		 	<td><input type="text" name="user_name" value="<?php $_POST['user_name'] ?>" maxlength="20"></td>
+		 	<td><input type="text" name="user_name" value="<?php if(isset($_POST['user_name'])) $_POST['user_name'] ?>" maxlength="20"></td>
 		 </tr>
 	 	 <tr>
 		 	<td>Address:</td>
-		 	<td><input type="text" name="user_address" value="<?php $_POST['user_address`'] ?>" maxlength="40"></td>
+		 	<td><input type="text" name="user_address" value="<?php if(isset($_POST['user_address'])) $_POST['user_address'] ?>" maxlength="40"></td>
 		 </tr>
 	  	 <tr>
 		 	<td>Phone:</td>
-		 	<td><input type="tel" name="user_phone" value="<?php $_POST['user_phone'] ?>"></td>
+		 	<td><input type="tel" name="user_phone" value="<?php if(isset($_POST['user_phone'])) $_POST['user_phone'] ?>"></td>
 		 </tr>
 		 <tr>
 		 	<td>User ID:</td>
-		 	<td><input type="text" name="user_id" maxlength="20" value="<?php $_POST['user_id'] ?>"></td>
+		 	<td><input type="text" name="user_id" maxlength="20" value="<?php if(isset($_POST['user_id'])) $_POST['user_id']; ?>"></td>
 		 </tr>
 		 <tr>
 		 	<td>Password:</td>
