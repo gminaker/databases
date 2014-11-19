@@ -35,7 +35,19 @@ create table hassong
 	);
  
 -- grant select on hassong to public;
+drop table if exists customer;
  
+create table customer
+	(cid varchar(20) not null,
+	c_password varchar(20) not null,
+	c_name varchar(40) not null,
+	address varchar(255) not null,
+    phone char(12) not null,
+    PRIMARY KEY (cid)
+	);
+ 
+-- grant select on customer to public;
+
 drop table if exists purchase;
  
 create table purchase
@@ -64,19 +76,6 @@ create table purchaseitem
  
 -- grant select on purchaseitem to public;
  
-drop table if exists customer;
- 
-create table customer
-	(cid varchar(20) not null,
-	c_password varchar(20) not null,
-	c_name varchar(40) not null,
-	address varchar(255) not null,
-    phone char(12) not null,
-    PRIMARY KEY (cid)
-	);
- 
--- grant select on customer to public;
- 
 drop table if exists returnrecord;
  
 create table returnrecord
@@ -102,35 +101,8 @@ create table returnitem
  
 -- grant select on returnitem to public;
  
---create unique index pubind on publishers
---(pub_id);
- 
-create unique index auidind 
-on authors (au_id);
- 
-create index aunmind 
-on authors (au_lname, au_fname);
- 
-create unique index titleidind 
-on titles (title_id);
- 
-create index titleind 
-on titles (title);
- 
-create unique index taind 
-on titleauthors (au_id, title_id);
- 
-create unique index edind 
-on editors (ed_id);
- 
-create index ednmind 
-on editors (ed_lname, ed_fname);
- 
-create unique index teind 
-on titleditors (ed_id, title_id);
-  
-create index rstidind 
-on roysched (title_id);
+-- create unique index pubind on publishers
+-- (pub_id);
  
 insert into item
 values('123456789012', 'Beyonce', 'cd',
