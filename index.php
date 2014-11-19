@@ -20,7 +20,7 @@
 
 // Open a connection to the database
 // TODO: update connection credentials 
-$connection = new mysqli("localhost", "root", "", "amsstore");
+$connection = new mysqli("Destroyer", "root", "", "amsstore");
 
 // Check that the connection was successful, otherwise exit
 if (mysqli_connect_errno()) {
