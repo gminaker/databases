@@ -17,12 +17,23 @@
  *
  */
 
+// Start a session to force the user to login
+session_start();
+
+$_SESSION['user_id'];
+$_SESSION['cart'];
 
 // Open a connection to the database
-// TODO: update connection credentials 
 $connection = new mysqli("localhost", "root", "", "amsstore");
 
-printf ("System status: %s\n", $connection->stat());
+if(isset($_POST['login_id'])){
+	$_SESSION['user_id'] = $_POST['login_id'];
+}
+
+if(isset($_GET['logout']) && $_GET['logout'] == true){
+	$_SESSION['user_id'] = null;
+	$_SESSION['cart'] = null;
+}
 
 // Check that the connection was successful, otherwise exit
 if (mysqli_connect_errno()) {
@@ -38,7 +49,7 @@ if (mysqli_connect_errno()) {
  */
 function getContent(){
 
-	if(isset($_GET['page'])){
+	if(isset($_GET['page']) && isset($_SESSION['user_id'])){
 	
 		  switch ($_GET['page']) {
 		  
@@ -74,8 +85,10 @@ function getContent(){
 		    include('views/default.php');
 		}
 		
-	}else{
+	}else if(isset($_SESSION['user_id'])){
 		include('views/default.php');
+	}else{
+		include('views/login.php');
 	}
 	
 }
@@ -102,6 +115,7 @@ function getContent(){
 			<td>Customers:</td>
 			<td><a href="?page=user_reg">Registration</a></td>
 			<td colspan="3"><a href="?page=purchase">Purchase</a></td>
+			<td colspan="3"><a href="?logout=true">Logout</a></td>
 		</tr>
 		<tr>
 			<td>Clerks:</td>
