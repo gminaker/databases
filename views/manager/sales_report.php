@@ -50,7 +50,7 @@ function generateDailySalesReport($date){
  <table>
 	 <tr>
 		 <td>Enter Date:</td>
-		 <td><input type=date name="report_date"></td>
+		 <td><input type=date name="report_date" class="dynamic_datepicker"></td>
 		 <td><input type=submit value="Generate Report"></td>
 	 </tr>
  </table>

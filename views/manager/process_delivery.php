@@ -27,7 +27,7 @@ function getAllOrdersToProcess(){
 		    print '<td>'.$row["p_date"].'</td>';
 		    print '<td>'.$row["p_cid"].'</td>';
 		    print '<td>'.$row["expectedDate"].'</td>';
-		    print '<td><input type=date></td>';
+		    print '<td><input type="date" name="date_'.$row["p_receiptId"].'" class="dynamic_datepicker"></td>';
 	    print '</tr>';
 	    
 	    $i++;

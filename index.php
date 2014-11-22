@@ -100,6 +100,10 @@ function getContent(){
 		<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
 		<meta content="utf-8" http-equiv="encoding">
 		
+		<link rel="stylesheet" href="jquery-ui-1.11.2/jquery-ui.min.css"  type="text/css" >
+		<script src="jquery-ui-1.11.2/external/jquery/jquery.js"></script>
+		<script src="jquery-ui-1.11.2/jquery-ui.min.js"></script>
+	
 		<title>Online Store V1</title>
 		
 		<!--  A stylesheet to modify colours, fonts, etc. -->
