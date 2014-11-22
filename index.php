@@ -85,6 +85,8 @@ function getContent(){
 		    include('views/default.php');
 		}
 		
+	}else if(!isset($_SESSION['user_id']) && isset($_GET['page']) && $_GET['page'] == 'user_reg'){
+		include('views/customer/customer_reg.php');
 	}else if(isset($_SESSION['user_id'])){
 		include('views/default.php');
 	}else{
@@ -115,24 +117,39 @@ function getContent(){
 		<tr>
 			<td colspan="5"> Online Store 1.0</td>
 		</tr>
-		<tr>
-			<td>Customers:</td>
-			<td><a href="?page=user_reg">Registration</a></td>
-			<td colspan="3"><a href="?page=purchase">Purchase</a></td>
-			<td colspan="3"><a href="?logout=true">Logout</a></td>
-		</tr>
-		<tr>
-			<td>Clerks:</td>
-			<td><a href="?page=return">Return Item</a></td>
-		</tr>
-		<tr>
-			<td>Managers:</td>
-			<td><a href="?page=add_items">Add Items</a></td>
-			<td><a href="?page=process_delivery">Process Delivery</a></td>
-			<td><a href="?page=sales_report">Daily Sales Report</a></td>
-			<td><a href="?page=top_selling_items">Top Selling Items</a></td>
-		</tr>
-		<tr>
+		<?php 
+		if(isset($_SESSION['user_id'])){
+			?>
+			<tr>
+				<td>Customers:</td>
+				<td><a href="?page=user_reg">Registration</a></td>
+				<td colspan="3"><a href="?page=purchase">Purchase</a></td>
+				<td colspan="3"><a href="?logout=true">Logout</a></td>
+			</tr>
+			<tr>
+				<td>Clerks:</td>
+				<td><a href="?page=return">Return Item</a></td>
+			</tr>
+			<tr>
+				<td>Managers:</td>
+				<td><a href="?page=add_items">Add Items</a></td>
+				<td><a href="?page=process_delivery">Process Delivery</a></td>
+				<td><a href="?page=sales_report">Daily Sales Report</a></td>
+				<td><a href="?page=top_selling_items">Top Selling Items</a></td>
+			</tr>
+
+			<?php
+		}else{
+			?>
+			<tr>
+				<td>Customers:</td>
+				<td><a href="?page=user_reg">Registration</a></td>
+				<td colspan="3"><a href="/">Login</a></td>
+			</tr>
+			<?php
+		}
+		?>
+				<tr>
 			<td colspan="5"><?php getContent(); ?></td>
 		</tr>
 		</table>
