@@ -13,6 +13,6 @@
  *
  */
  
- echo "Top Selling Items Page";
  
- ?>
+ 
+?>
