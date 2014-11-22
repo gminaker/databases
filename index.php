@@ -105,6 +105,7 @@ function getContent(){
 		<link rel="stylesheet" href="jquery-ui-1.11.2/jquery-ui.min.css"  type="text/css" >
 		<script src="jquery-ui-1.11.2/external/jquery/jquery.js"></script>
 		<script src="jquery-ui-1.11.2/jquery-ui.min.js"></script>
+		<script src="js/datepicker.js"></script>
 	
 		<title>Online Store V1</title>
 		
