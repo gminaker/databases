@@ -81,31 +81,48 @@ function insertIntoDB($user_id, $user_pass, $cc_no, $cc_ex, $expected_date, $all
     // Execute the insert statement
     $stmt->execute();
     
+    $error_stack = array();
+    
     // Print any errors if they occured
     if($stmt->error) {       
-      printf("<b>Error: %s.</b>\n", $stmt->error);
-    } else {
-      echo "<b>Successfully added ".$title."</b>";
-      unset($_POST);
-    }      
+      array_push($error_stack, $stmt->error);
+    }     
     
+
     $i=0;
-    $receipt_id = $stmt->insert_id;
+    $receiptId = $stmt->insert_id;
     
-    foreach($_POST as $key => $value) {
-	  $pos = strpos($key , "purchase");
-	  if ($pos === 0){
-		  $stmt = $connection->prepare("INSERT INTO purchaseitem (pi_receiptId, pi_upc, pi_quantity) VALUES (?,?,?)");
-		  // Bind the title and pub_id parameters, 'sss' indicates 3 strings
-		  $stmt->bind_param("sss",$receiptId, $_POST['purchase['.$i.'][upc]'], $_POST['purchase['.$i.'][qty]']);
-		  // Execute the insert statement
-		  $stmt->execute();
-		  $i++;
-	    //TODO get all items wanting to be purchased, their qty, and add into purchaseItem table
-	  }
+    if(isset($_POST['purchase'])){
+	    foreach($_POST['purchase'] as $key => $value) {
+		    
+			    $upc = $value['upc'];
+			    $qty = $value['qty'];
+			    
+				if ($qty > 0){
+				  	
+				$stmt = $connection->prepare("INSERT INTO purchaseitem (pi_receiptId, pi_upc, pi_quantity) VALUES (?,?,?)");
+				  // Bind the title and pub_id parameters, 'sss' indicates 3 strings
+				$stmt->bind_param("sss",$receiptId, $upc, $qty);
+				  // Execute the insert statement
+				$stmt->execute();
+				  // Print any errors if they occured
+				if($stmt->error) {       
+				  array_push($error_stack, $stmt->error);
+				}    
+				
+				$i++;
+			
+			}
+		}
+	}
+	
+	if(count($error_stack) > 0){
+		print("Errors occurred:");
+		print_r($error_stack);
+	}else{
+		print("Order was submitted successfully!");
 	}
               
-    $id = $mysqli->insert_id;
     
  }
  
