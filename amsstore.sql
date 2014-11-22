@@ -1,4 +1,4 @@
-use test;
+use amsstore;
 drop table if exists item;
 create table item
 	(it_upc char(12) not null,
@@ -29,7 +29,7 @@ drop table if exists hassong;
  
 create table hassong
 	(hs_upc char(12) not null,
-	hs_title varchar(20) null,
+	hs_title varchar(40) null,
 	PRIMARY KEY (hs_upc, hs_title),
 	FOREIGN KEY (hs_upc) REFERENCES item(it_upc)
 	);
