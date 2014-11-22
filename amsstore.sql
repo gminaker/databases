@@ -1,4 +1,4 @@
-
+use amsstore;
 drop table if exists item;
 create table item
 	(it_upc char(12) not null,
@@ -35,6 +35,7 @@ create table hassong
 	);
  
 -- grant select on hassong to public;
+
 drop table if exists customer;
  
 create table customer
@@ -101,12 +102,33 @@ create table returnitem
  
 -- grant select on returnitem to public;
  
--- create unique index pubind on publishers
--- (pub_id);
+create unique index itemindex
+on item (it_upc);
+
+create unique index leadsingerindex
+on leadsinger (ls_upc, ls_name);
+
+create unique index hassongindex
+on hassong (hs_upc, hs_title);
+
+create unique index customerindex
+on customer (cid);
+
+create unique index purchaseindex
+on purchase (p_receiptID);
+
+create unique index purchaseitemindex
+on purchaseitem (pi_receiptId, pi_upc);
+
+create unique index returnrecordindex
+on returnrecord (retId);
+
+create unique index returnitemindex 
+on returnitem (ri_retId, ri_upc);
  
 insert into item
 values('123456789012', 'Beyonce', 'cd',
-'pop', 'Rocafella', YEAR(2014), 9.99, 5);
+'pop', 'Rocafella', 2014, 9.99, 5);
   
 insert into leadsinger
 values('123456789012', 'Beyonce');
