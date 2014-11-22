@@ -24,7 +24,7 @@ $_SESSION['user_id'];
 $_SESSION['cart'];
 
 // Open a connection to the database
-$connection = new mysqli("localhost", "root", "", "amsstore");
+$connection = new mysqli("localhost", "root", "", "test");
 
 if(isset($_POST['login_id'])){
 	$_SESSION['user_id'] = $_POST['login_id'];
