@@ -54,7 +54,7 @@ function calculateExpectedDate(){
  */
 function checkValues($user_id, $user_pass, $cc_no, $cc_ex, $all){
 	
-	//TODO checl 
+	//TODO check user id & password.
 	return null;
 }
 
@@ -73,10 +73,10 @@ function checkValues($user_id, $user_pass, $cc_no, $cc_ex, $all){
 function insertIntoDB($user_id, $user_pass, $cc_no, $cc_ex, $expected_date, $all){
 
 	global $connection;
- 	$stmt = $connection->prepare("INSERT INTO purchase (p_receiptid, p_date, p_cid, cardNo, expiryDate, expectedDate) VALUES (?,?,?,?,?,?)");
+ 	$stmt = $connection->prepare("INSERT INTO purchase (p_date, p_cid, cardNo, expiryDate, expectedDate) VALUES (?,?,?,?,?)");
     
     // Bind the title and pub_id parameters, 'sss' indicates 3 strings
-    $stmt->bind_param("ssssss", $user_id, $user_pass, $cc_no, $cc_ex, $expected_date);
+    $stmt->bind_param("sssss", $user_id, $user_pass, $cc_no, $cc_ex, $expected_date);
     
     // Execute the insert statement
     $stmt->execute();
@@ -89,10 +89,18 @@ function insertIntoDB($user_id, $user_pass, $cc_no, $cc_ex, $expected_date, $all
       unset($_POST);
     }      
     
+    $i=0;
+    $receipt_id = $stmt->insert_id;
     
     foreach($_POST as $key => $value) {
 	  $pos = strpos($key , "purchase");
 	  if ($pos === 0){
+		  $stmt = $connection->prepare("INSERT INTO purchaseitem (pi_receiptId, pi_upc, pi_quantity) VALUES (?,?,?)");
+		  // Bind the title and pub_id parameters, 'sss' indicates 3 strings
+		  $stmt->bind_param("sss",$receiptId, $_POST['purchase['.$i.'][upc]'], $_POST['purchase['.$i.'][qty]']);
+		  // Execute the insert statement
+		  $stmt->execute();
+		  $i++;
 	    //TODO get all items wanting to be purchased, their qty, and add into purchaseItem table
 	  }
 	}
