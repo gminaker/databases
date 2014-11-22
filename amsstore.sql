@@ -128,25 +128,25 @@ create unique index returnitemindex
 on returnitem (ri_retId, ri_upc);
  
 insert into item
-values('123456789012', 'Beyonce', 'cd','pop', 'Rocafella', 2014, 9.99, 5);
+values('123456789012', 'Beyonce', 'cd','pop', 'Rocafella', 2014, 9.99, 12);
 
 insert into item
 values('135658852258', 'Duotones', 'cd', 'instrumental', 'Arista', 1986, 12.99, 15);
 
 insert into item
-values('288933147766', 'Heartbreaker', 'cd', 'rap', 'YG Entertainment', 2009, 10.99, 0);
+values('288933147766', 'Heartbreaker', 'cd', 'rap', 'YG Entertainment', 2009, 10.99, 10);
 
 insert into item
-values('123658216924', 'Memoirs of a Madman', 'dvd', 'rock', 'Sony Music Canada', 2014, 17.97, 1);
+values('123658216924', 'Memoirs of a Madman', 'dvd', 'rock', 'Sony Music Canada', 2014, 17.97, 11);
 
 insert into item
-values('258624782046', 'Christmas Countdown', 'dvd', 'pop', 'Warner Bros', 2010, 19.99, 3);
+values('258624782046', 'Christmas Countdown', 'dvd', 'pop', 'Warner Bros', 2010, 19.99, 13);
 
 insert into item
-values('246198346910', 'This is Us', 'dvd', 'pop', 'Sony Pictures', 2014, 19.99, 0);
+values('246198346910', 'This is Us', 'dvd', 'pop', 'Sony Pictures', 2014, 19.99, 20);
 
 insert into item
-values('132468245973', 'Based on a True Story', 'cd', 'country', 'Warner Bros.', 2013, 12.99, 9);
+values('132468245973', 'Based on a True Story', 'cd', 'country', 'Warner Bros.', 2013, 12.99, 19);
 
 insert into item
 values('213469245706', 'Beethoven: Complete Piano Sonatas', 'cd', 'classical', 'Deutsche Grammophon', 1991, 43.98, 8);
@@ -235,20 +235,71 @@ values('powerpuffgirls', 'sugarandspice', 'Buttercup', '21300 Roscoe Blvd, Calif
 insert into customer
 values('tinkerbell', 'peterpansucks', 'Tinker', '16441 108A Tree, Neverneverland', '12352321025');
 
-insert into purchase
-values('3216', "2014-07-01", 'cocopuffsrule', '5957156807596423', "2015-03", "2014-07-08", "2014-07-08");
+insert into customer
+values('peterpan', 'lostboys', 'Peter', '62 Renmin Lu, Qindao shi, Shangdong, China', '23650258740');
+
+insert into customer
+values('snowman', 'buildasnowman', 'Olaf', '1929 North Pole, Edmonton, Alberta, Canada', '12589631470');
 
 insert into purchase
-values('3418', "2014-09-01", 'cocopuffsrule', '5957156807596423', "2015-03", "2014-09-10", "2014-09-11");
+values('3216', 20140701, 'cocopuffsrule', '5957156807596423', 20150301, 20140708, 20140708);
 
 insert into purchase
-values('3258', "2014-10-6", 'cocopuffsrule', '7216734982054673', "2015-03", "2014-10-12", "2014-10-12");
+values('3418', 20140901, 'cocopuffsrule', '5957156807596423', 20150301, 20140910, 20140911);
 
 insert into purchase
-values('3201', "2014-10-6", 'powerpuffgirls', '2167308595021675', "2015-03", "2014-10-10", "2014-10-12");
+values('3258', 20141006, 'peterpan', '7216734982054673', 20150301, 20141012, 20141012);
 
 insert into purchase
-values('3815', "2014-10-16", 'cocopuffsrule', '5957156807596423', "2020-03", "2014-10-21", "2014-10-21");
+values('3201', 20141006, 'powerpuffgirls', '2167308595021675', 20150301, 20141010, 20141012);
+
+insert into purchase
+values('3815', 20141016, 'cocopuffsrule', '5957156807596423', 20200301, 20141021, 20141021);
+
+insert into purchase
+values('3215', 20141115, 'mojojojo', '6197345168011258', 20150901, 20141120, 20141120);
+
+insert into purchase
+values('3925', 20141115, 'tinkerbell', '5163794851243658', 20150901, 20141120, 20141120);
+
+insert into purchase
+values('3926', 20141115, 'tinkerbell', '5163794851243658', 20150901, 20141120, 20141120);
+
+insert into purchase
+values('3219', 20141116, 'mojojojo', '5163794851243658', 20150901, 20141119, 20141119);
+
+insert into purchase
+values('3752', 20141116, 'cocopuffsrule', '5957156807596423', 20200301, 20141119, 20141119);
+
+insert into purchase
+values('3854', 20141116, 'peterpan', '7216734982054673', 20150301, 20141119, 20141120);
+
+insert into purchase
+values('3621', 20141116, 'peterpan', '7216734982054673', 20150301, 20141119, 20141120);
+
+insert into purchase
+values('3948', 20141117, 'snowman', '9521456985410254', 20150901, 20141120, 20141120);
+
+insert into purchase
+values('3058', 20141118, 'tinkerbell', '5163794851243658', 20150901, 20141121, 20141121);
+
+insert into purchase
+values('3264', 20141118, 'snowman', '9521456985410254', 20150901, 20141121, 20141121);
+
+insert into purchase
+values('3624', 20141119, 'peterpan', '7216734982054673', 20150301, 20141122, null);
+
+insert into purchase
+values('3958', 20141120, 'cocopuffsrule', '5957156807596423', 20200301, 20141125, null);
+
+insert into purchase
+values('3814', 20141121, 'powerpuffgirls', '2167308595021675', 20150301, 20141125, null);
+
+insert into purchase
+values('3001', 20141122, 'tinkerbell', '5163794851243658', 20150901, 20141126, null);
+
+insert into purchase
+values('3015', 20141122, 'tinkerbell', '5163794851243658', 20150901, 20141126, null);
 
 insert into purchaseitem
 values('3216', '123456789012', 1);
@@ -265,13 +316,85 @@ values('3201','123658216924', 1);
 insert into purchaseitem
 values('3815','616402673105', 2);
 
-insert into returnrecord
-values('2365', "2014-07-19", '3216');
+insert into purchaseitem
+values('3215','132468245973', 3);
+
+insert into purchaseitem
+values('3925','258624782046', 1);
+
+insert into purchaseitem
+values('3926', '616402673105', 1);
+
+insert into purchaseitem
+values('3219', '132468245973', 1);
+
+insert into purchaseitem
+values('3752', '258624782046', 1);
+
+insert into purchaseitem
+values('3854', '976135610258', 1);
+
+insert into purchaseitem
+values('3621', '123456789012', 1);
+
+insert into purchaseitem
+values('3948', '288933147766', 1);
+
+insert into purchaseitem
+values('3058', '246198346910', 2);
+
+insert into purchaseitem
+values('3264', '288933147766', 1);
+
+insert into purchaseitem
+values('3624', '135658852258', 3);
+
+insert into purchaseitem
+values('3958', '258624782046', 1);
+
+insert into purchaseitem
+values('3814', '976135610258', 2);
+
+insert into purchaseitem
+values('3001', '616402673105', 1);
+
+insert into purchaseitem
+values('3015', '213469245706', 1);
 
 insert into returnrecord
-values('2918', "2014-11-12", '3815');
+values('2365', 20140719, '3216');
+
+insert into returnrecord
+values('2918', 20141112, '3815');
+
+insert into returnrecord
+values('2912', 20141119, '3058');
+
+insert into returnrecord
+values('2963', 20141121, '3854');
+
+insert into returnrecord
+values('2945', 20141118, '3948');
+
+insert into returnrecord
+values('2932', 20141120, '3752');
 
 insert into returnitem
 values('2365', '123456789012', 1);
+
+insert into returnitem
+values('2918', '616402673105', 2);
+
+insert into returnitem
+values('2912', '246198346910', 1);
+
+insert into returnitem
+values('2963', '976135610258', 1);
+
+insert into returnitem
+values('2945', '288933147766', 1);
+
+insert into returnitem
+values('2932', '258624782046', 1);
 
 commit;
