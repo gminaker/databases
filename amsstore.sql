@@ -236,19 +236,19 @@ insert into customer
 values('tinkerbell', 'peterpansucks', 'Tinker', '16441 108A Tree, Neverneverland', '12352321025');
 
 insert into purchase
-values('3216', 2014-07-01, 'cocopuffsrule', '5957156807596423', 2015-03, 2014-07-08, 2014-07-08);
+values('3216', "2014-07-01", 'cocopuffsrule', '5957156807596423', "2015-03", "2014-07-08", "2014-07-08");
 
 insert into purchase
-values('3418', 2014-09-01, 'cocopuffsrule', '5957156807596423', 2015-03, 2014-09-10, 2014-09-11);
+values('3418', "2014-09-01", 'cocopuffsrule', '5957156807596423', "2015-03", "2014-09-10", "2014-09-11");
 
 insert into purchase
-values('3258', 2014-10-6, 'cocopuffsrule', '7216734982054673', 2015-03, 2014-10-12, 2014-10-12);
+values('3258', "2014-10-6", 'cocopuffsrule', '7216734982054673', "2015-03", "2014-10-12", "2014-10-12");
 
 insert into purchase
-values('3201', 2014-10-6, 'powerpuffgirls', '2167308595021675', 2015-03, 2014-10-10, 2014-10-12);
+values('3201', "2014-10-6", 'powerpuffgirls', '2167308595021675', "2015-03", "2014-10-10", "2014-10-12");
 
 insert into purchase
-values('3815', 2014-10-16, 'cocopuffsrule', '5957156807596423', 2020-03, 2014-10-21, 2014-10-21);
+values('3815', "2014-10-16", 'cocopuffsrule', '5957156807596423', "2020-03", "2014-10-21", "2014-10-21");
 
 insert into purchaseitem
 values('3216', '123456789012', 1);
@@ -266,15 +266,12 @@ insert into purchaseitem
 values('3815','616402673105', 2);
 
 insert into returnrecord
-values('2365', 2014-07-19, '3216');
+values('2365', "2014-07-19", '3216');
 
 insert into returnrecord
-values('2918', 2014-11-12, '3815');
+values('2918', "2014-11-12", '3815');
 
 insert into returnitem
 values('2365', '123456789012', 1);
 
-insert into returnitem
-values('3815', '616402673105', 1);
- 
 commit;
