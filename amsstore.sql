@@ -81,7 +81,7 @@ create table purchaseitem
 drop table if exists returnrecord;
  
 create table returnrecord
-	(retId int not null,
+	(retId int not null auto_increment,
 	ret_date DATETIME not null,
 	ret_receiptId int null,
     PRIMARY KEY (retId),
