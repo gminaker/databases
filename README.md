@@ -24,3 +24,4 @@ Specific things TODO:
 - process_refund - Not started!
 - login process - actually needs to check db, etc.
 - test all operations, add appropriate error messages, check for null entries (""), check inputs
+- Check prev phases to make sure constraints are being checked, etc.
