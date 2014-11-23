@@ -16,7 +16,7 @@
 function generateDailySalesReport($date){
 	global $connection;
 	
-	$date = date('Y-m-d h:i:s', strtotime($date));
+	$date = date('Y-m-d', strtotime($date));
 	
 	$results = $connection->query("	SELECT i.it_upc, sum(pi.pi_quantity)
 									FROM purchase p, purchaseItem pi, item i 
