@@ -1,3 +1,4 @@
 <form method="post" action="/">
-User ID:<input type="text" name="login_id">
+Username:<input type="text" name="login_id"><br />
+Password:<input type="password" name="login_pass">
 <input type=submit value="Login">

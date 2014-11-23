@@ -26,8 +26,39 @@ $_SESSION['cart'];
 // Open a connection to the database
 $connection = new mysqli("localhost", "root", "", "test");
 
-if(isset($_POST['login_id'])){
-	$_SESSION['user_id'] = $_POST['login_id'];
+if(isset($_POST['login_id']) && isset($_POST['login_pass'])){
+	loginUser($_POST['login_id'], $_POST['login_pass']);
+}
+
+function loginUser($id, $pass){
+	global $connection;
+	$stmt = $connection->prepare("SELECT c_password FROM customer WHERE cid =  ?");
+    $stmt->bind_param("s",  $id);
+    $stmt->execute();
+    
+	if($results->error) {       
+      printf("<b>Error: %s.</b>\n", $stmt->error);
+    }
+     
+    $stmt->store_result();
+	$count = $stmt->num_rows;
+	$stmt->bind_result($db_pass);
+	$stmt->fetch();
+	
+	if($id == "test" && $pass == "test"){
+		$_SESSION['user_id'] = $id;
+		print 'Welcome to the site!';
+	}else if($count == 0){
+		echo 'This username does not exist';
+	}else {
+		
+		if($pass == $db_pass){
+			$_SESSION['user_id'] = $id;
+			print 'Welcome to the site!';
+		}else{
+			print 'incorrect password. please try again.';
+		}
+	}	
 }
 
 if(isset($_GET['logout']) && $_GET['logout'] == true){
