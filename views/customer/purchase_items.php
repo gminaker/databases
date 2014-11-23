@@ -76,7 +76,7 @@ function insertIntoDB($user_id, $user_pass, $cc_no, $cc_ex, $expected_date, $all
  	$stmt = $connection->prepare("INSERT INTO purchase (p_date, p_cid, cardNo, expiryDate, expectedDate) VALUES (?,?,?,?,?)");
     
     // Bind the title and pub_id parameters, 'sss' indicates 3 strings
-    $stmt->bind_param("sssss", $user_id, $user_pass, $cc_no, $cc_ex, $expected_date);
+    $stmt->bind_param("sssss", date('Y-m-d h:i:s', time()), $user_id, $cc_no, $cc_ex, $expected_date);
     
     // Execute the insert statement
     $stmt->execute();
@@ -88,8 +88,6 @@ function insertIntoDB($user_id, $user_pass, $cc_no, $cc_ex, $expected_date, $all
       array_push($error_stack, $stmt->error);
     }     
     
-
-    $i=0;
     $receiptId = $stmt->insert_id;
     
     if(isset($_POST['purchase'])){
@@ -109,9 +107,6 @@ function insertIntoDB($user_id, $user_pass, $cc_no, $cc_ex, $expected_date, $all
 				if($stmt->error) {       
 				  array_push($error_stack, $stmt->error);
 				}    
-				
-				$i++;
-			
 			}
 		}
 	}
