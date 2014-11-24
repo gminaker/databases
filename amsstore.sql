@@ -36,7 +36,6 @@ create table hassong
  
 -- grant select on hassong to public;
 
- 
 drop table if exists customer;
  
 create table customer
@@ -49,7 +48,7 @@ create table customer
 	);
  
 -- grant select on customer to public;
- 
+
 drop table if exists purchase;
  
 create table purchase
