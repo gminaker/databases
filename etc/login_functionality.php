@@ -19,7 +19,7 @@ function loginUser($id, $pass){
     $stmt->bind_param("s",  $id);
     $stmt->execute();
     
-	if($results->error) {         
+	if($stmt->error) {         
       array_push($error_stack, "<b>Error: %s.</b>\n", $stmt->error);
     }
      
