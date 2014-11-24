@@ -19,6 +19,14 @@ function getContent(){
 		  case "purchase":
 		    include('views/customer/purchase_items.php');
 		    break;
+
+		  case "view_cart":
+		    include('views/customer/view_cart.php');
+		    break;
+		    
+		  case "advanced_search":
+		    include('views/customer/advanced_search.php');
+		    break;
 		    
 		  case "return":
 		    include('views/clerk/process_refund.php');

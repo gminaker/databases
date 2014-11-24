@@ -73,13 +73,18 @@ function displayErrors(){
 		<h1>Online Store V2</h1>
 		</div>
 		<div id="nav">
+			<h2>Item Search</h2>
+			<form name="item_search" method="post" action="?page=advanced_search">
+			<input name="quick_search" type="search" size="12">
+			<input type="submit" value="Go">
+			<a href="?page=advanced_search">advanced search</a>
 		<?php 
 		if(isset($_SESSION['user_id'])){
 			?>
 			
 				<h2>Customers</h2>
 				<ul>
-				<li><a href="?page=user_reg">Registration</a></li>
+				<li><a href="?page=view_cart">View Cart</a></li>
 				<li><a href="?page=purchase">Purchase</a></li>
 				<li><a href="?logout=true">Logout</a></li>
 				</ul>
