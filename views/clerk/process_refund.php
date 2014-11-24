@@ -152,7 +152,7 @@
 	    $stmt->execute();
 	    
 		if($stmt->error) {       
-	      printf("<b>Error: %s.</b>\n", $stmt->error);
+	      printf("<b>Error: %s.</b><br />", $stmt->error);
 	    }
 	     
 	    $stmt->store_result();
