@@ -173,7 +173,7 @@
 		
 		if($diff->days > 15) {
 			$oldReceipt = true;
-		    echo 'Warning: This receipt was issued more than 15 days ago';
+		    print 'Warning: This receipt was issued more than 15 days ago';
 		}
 	    
 		print '<table>';
@@ -199,7 +199,7 @@
 		if (!$oldReceipt) {
 			print '<tr><th>UPC</th><th>Title</th><th>Order QTY</th><th>Return QTY</th></tr>';
 		} else {
-			print '<tr><th>UPC</th><th>Title</th><th>Order QTY</th>/tr>';
+			print '<tr><th>UPC</th><th>Title</th><th>Order QTY</th></tr>';
 		}
 	    
 	    getAllReceiptItems($receiptId, $oldReceipt);
@@ -237,8 +237,7 @@
 			<input type="hidden" name="return['.$i.'][pqty]" value='.$quantity.'>';
 			if (!$oldReceipt) {
 				print '<td><input type="text" name="return['.$i.'][qty]"></td>';
-			}
-		               
+			}	               
 			print '</tr>';
 			$i++;
 	    }
