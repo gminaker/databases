@@ -109,6 +109,10 @@ function generateDailySalesReport($date){
  
  <?php 
 	 
- if(isset($_POST['report_date'])){
+ if(isset($_POST['report_date'])
+ 	and (!empty($_POST['report_date']))){
 	 generateDailySalesReport($_POST['report_date']);
+ } else if (isset($_POST['report_date'])){
+ 	print "Please select date";
  }
+ ?>

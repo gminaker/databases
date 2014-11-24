@@ -67,8 +67,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
  */
 function checkValues($upc, $title, $type, $category, $company, $year, $price, $stock){
 	
-	//TODO Implement if we want to check minimum length for passwords, etc. 
-	return null;
+	if (!is_numeric($upc) or (strlen($upc) != 12)){
+		return "Please recheck UPC";
+	} else if (strlen($title) > 40){
+		return "Title too long";
+	} else if (strlen($company) > 40){
+		return "Company name too long";
+	} else if (!is_numeric($year) or (strlen($year) != 4)){
+		return "Please recheck year";
+	} else if (!is_numeric($stock) or (intval($stock) < 0)){
+		return "Please recheck stock";
+	}else if (empty($upc) or empty($title) or empty($type) or empty($category) or empty($company) or empty($year) or empty($price) or empty($stock)){
+		return "Please fill in all fields";
+	} else {
+		return null;
+	}
 }
 
 
