@@ -8,7 +8,7 @@
  *
  * PHP version 5
  *
- * @author     Gordon
+ * @author     Gordon, Thomas
  * @since    1.0
  *
  */
@@ -32,7 +32,7 @@ function generateDailySalesReport($date){
  	if($results->num_rows == 0){
 	 	print '<table><tr><td colspan=5>No Items Found</td></tr></table>';
  	} else {
- 		print '<table><tr><td colspan=5>Report for: '.$date.'</td></tr><tr></tr>';
+ 		print '<table><tr><th colspan=5>Report for: '.$date.'</th></tr><tr></tr>';
 	 	print '<tr>	<th>UPC</th>
 	 				<th>Category</th>
  				<th>Unit Price</th>
