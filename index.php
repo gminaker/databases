@@ -77,6 +77,7 @@ function displayErrors(){
 			<form name="item_search" method="post" action="?page=advanced_search">
 			<input name="quick_search" type="search" size="12">
 			<input type="submit" value="Go">
+			</form>
 			<a href="?page=advanced_search">advanced search</a>
 		<?php 
 		if(isset($_SESSION['user_id'])){
