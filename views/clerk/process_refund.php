@@ -84,7 +84,7 @@
 	    $stmt->bind_param("s",  $receiptId);
 	    $stmt->execute();
 	    
-		if($results->error) {       
+		if($stmt->error) {       
 	      printf("<b>Error: %s.</b>\n", $stmt->error);
 	    }
 	     
@@ -96,11 +96,14 @@
 		if($count == 0){
 			print("Sorry bud, can't find that receipt");
 			exit();
+		} else {
+			$stmt->fetch();
 		}
-
-		$date = new DateTime($row["p_date"]);
+		
+		var_dump($date);
+		$r_date = new DateTime($date);
 		$now = new DateTime();
-		$diff = $now->diff($date);
+		$diff = $now->diff($r_date);
 		
 		if($diff->days > 15) {
 		    echo 'Warning: This receipt was issued more than 15 days ago';
@@ -116,7 +119,7 @@
 		print '</tr>';
 		print '<tr>';
 			print '<td>Receipt Date:</td>';
-		    print '<td>'. date('Y-m-d' , $date->getTimestamp()) .'</td>';
+		    print '<td>'. date('Y-m-d' , $r_date->getTimestamp()) .'</td>';
 		print '</tr>';
 		print '<tr>';
 			print '<td>Customer ID:</td>';
@@ -141,7 +144,7 @@
 	    $stmt->bind_param("s",  $receiptId);
 	    $stmt->execute();
 	    
-		if($results->error) {       
+		if($stmt->error) {       
 	      printf("<b>Error: %s.</b>\n", $stmt->error);
 	    } 
 	    
