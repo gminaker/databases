@@ -69,11 +69,11 @@ function getAllOrdersToProcess(){
 		print '<input type="hidden" name="updates['.$i.'][receipt]" value='.$row["p_receiptId"].'>';
 	    print '<tr>';
 		    print '<td>'.$row["p_receiptId"].'</td>';
-		    print '<td>'.$row["p_date"].'</td>';
+		    print '<td>'.date('Y-m-d', strtotime($row["p_date"])).'</td>';
 		    print '<td>'.$row["p_cid"].'</td>';
-		    print '<td>'.$row["expectedDate"].'</td>';
+		    print '<td>'.date('Y-m-d', strtotime($row["expectedDate"])).'</td>';
 		    if(isset($row["deliveredDate"])){
-			    print '<td>'.$row["deliveredDate"].'</td>';
+			    print '<td>'.date('Y-m-d', strtotime($row["deliveredDate"])).'</td>';
 		    }else{
 		    	print '<td><input type="date" name="updates['.$i.'][date]" class="dynamic_datepicker"></td>';
 		    }
