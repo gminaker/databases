@@ -54,7 +54,7 @@ function calculateExpectedDate(){
  */
 function checkValues($user_id, $user_pass, $cc_no, $cc_ex, $all){
 	
-	//TODO checl 
+	//TODO check user id & password.
 	return null;
 }
 
@@ -73,31 +73,51 @@ function checkValues($user_id, $user_pass, $cc_no, $cc_ex, $all){
 function insertIntoDB($user_id, $user_pass, $cc_no, $cc_ex, $expected_date, $all){
 
 	global $connection;
- 	$stmt = $connection->prepare("INSERT INTO purchase (p_receiptid, p_date, p_cid, cardNo, expiryDate, expectedDate) VALUES (?,?,?,?,?,?)");
+ 	$stmt = $connection->prepare("INSERT INTO purchase (p_date, p_cid, cardNo, expiryDate, expectedDate) VALUES (?,?,?,?,?)");
     
     // Bind the title and pub_id parameters, 'sss' indicates 3 strings
-    $stmt->bind_param("ssssss", $user_id, $user_pass, $cc_no, $cc_ex, $expected_date);
+    $stmt->bind_param("sssss", date('Y-m-d h:i:s', time()), $user_id, $cc_no, $cc_ex, $expected_date);
     
     // Execute the insert statement
     $stmt->execute();
     
+    $error_stack = array();
+    
     // Print any errors if they occured
     if($stmt->error) {       
-      printf("<b>Error: %s.</b>\n", $stmt->error);
-    } else {
-      echo "<b>Successfully added ".$title."</b>";
-      unset($_POST);
-    }      
+      array_push($error_stack, $stmt->error);
+    }     
     
+    $receiptId = $stmt->insert_id;
     
-    foreach($_POST as $key => $value) {
-	  $pos = strpos($key , "purchase");
-	  if ($pos === 0){
-	    //TODO get all items wanting to be purchased, their qty, and add into purchaseItem table
-	  }
+    if(isset($_POST['purchase'])){
+	    foreach($_POST['purchase'] as $key => $value) {
+		    
+			    $upc = $value['upc'];
+			    $qty = $value['qty'];
+			    
+				if ($qty > 0){
+				  	
+				$stmt = $connection->prepare("INSERT INTO purchaseitem (pi_receiptId, pi_upc, pi_quantity) VALUES (?,?,?)");
+				  // Bind the title and pub_id parameters, 'sss' indicates 3 strings
+				$stmt->bind_param("sss",$receiptId, $upc, $qty);
+				  // Execute the insert statement
+				$stmt->execute();
+				  // Print any errors if they occured
+				if($stmt->error) {       
+				  array_push($error_stack, $stmt->error);
+				}    
+			}
+		}
+	}
+	
+	if(count($error_stack) > 0){
+		print("Errors occurred:");
+		print_r($error_stack);
+	}else{
+		print("Order was submitted successfully!");
 	}
               
-    $id = $mysqli->insert_id;
     
  }
  

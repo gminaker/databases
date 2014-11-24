@@ -101,7 +101,7 @@ function insertIntoDB($name, $addr, $tel, $id, $pass){
     if($stmt->error) {       
       printf("<b>Error: %s.</b>\n", $stmt->error);
     } else {
-      echo "<b>Successfully added ".$title."</b>";
+      echo "<b>Successfully added ".$id."</b>";
       unset($_POST);
     }      
     

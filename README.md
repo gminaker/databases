@@ -14,3 +14,14 @@ I have commented customer_reg.php (in the /views/customer/ directory) as best I 
 We still need to finish the implementation of all other files in the /views/ directory. 
 Reference the customer_reg file and the boobiz_mysql file to help complete the rest of the 
 pages. 
+
+Specific things TODO:
+
+- checkValues - for most operations
+- sales_report - Started, not completed/tested (errors, doesn't work, etc.)
+- process_delivery - Started, not completed/tested (errors, doesn't work, etc.)
+- purchase_items - Started, not completed/tested (errors, doesn't work, etc.)
+- process_refund - Not started!
+- login process - actually needs to check db, etc.
+- test all operations, add appropriate error messages, check for null entries (""), check inputs
+- Check prev phases to make sure constraints are being checked, etc.

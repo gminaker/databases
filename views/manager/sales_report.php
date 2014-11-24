@@ -15,11 +15,14 @@
  
 function generateDailySalesReport($date){
 	global $connection;
+	
+	$date = date('Y-m-d', strtotime($date));
+	
 	$results = $connection->query("	SELECT i.it_upc, sum(pi.pi_quantity)
 									FROM purchase p, purchaseItem pi, item i 
 									WHERE p.p_receiptId = pi.pi_receiptId
 									AND pi.pi_upc = i.it_upc
-									AND p.p_date = $date
+									AND p.p_date = '$date'
 									GROUP BY i.it_upc");
 									
 	if(!$results){
@@ -50,7 +53,7 @@ function generateDailySalesReport($date){
  <table>
 	 <tr>
 		 <td>Enter Date:</td>
-		 <td><input type=date name="report_date"></td>
+		 <td><input type=date name="report_date" class="dynamic_datepicker"></td>
 		 <td><input type=submit value="Generate Report"></td>
 	 </tr>
  </table>
