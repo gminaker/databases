@@ -13,10 +13,12 @@
  *
  */
  
-function generateDailySalesReport($date){
+function generateDailySalesReport($raw_date){
 	global $connection;
+	global $notice_stack;
+	global $error_stack;
 	
-	$date = date('Y-m-d', strtotime($date));
+	$date = date('Y-m-d', strtotime($raw_date));
 	
 	$results = $connection->query("	SELECT i.it_upc, i.category, i.price, sum(pi.pi_quantity), i.price*sum(pi.pi_quantity)
 									FROM purchase p, purchaseItem pi, item i 
@@ -26,11 +28,11 @@ function generateDailySalesReport($date){
 									GROUP BY i.it_upc, i.category, i.price;");
 									
 	if(!$results){
-		printf("Error: %s\n", $connection->error);
+		print_f("Error: %s\n", $connection->error);
 	}						
  	
  	if($results->num_rows == 0){
-	 	print '<table><tr><td colspan=5>No Items Found</td></tr></table>';
+	 	print('No sales records found for '.$raw_date);
  	} else {
  		print '<table><tr><th colspan=5>Report for: '.$date.'</th></tr><tr></tr>';
 	 	print '<tr>	<th>UPC</th>
