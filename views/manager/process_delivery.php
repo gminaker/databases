@@ -12,6 +12,8 @@
  *
  */
  
+
+ 
    if ($_SERVER["REQUEST_METHOD"] == "POST") {
  		
       if (isset($_POST["updateDeliveryDates"]) && $_POST["updateDeliveryDates"] == "SUBMIT") {
@@ -20,11 +22,12 @@
    }
    
    function checkValsThenInsertIntoDB($all){
-	   $error_stack = array();
-	   
+	    global $error_stack;
+		global $notice_stack;
+ 
 	   if(isset($_POST['updates'])){
 		   foreach($_POST['updates'] as $key => $value) {
-			    
+			   
 			    $receiptId = $value['receipt'];
 			    $date = $value['date'];
 			    
@@ -48,40 +51,37 @@
 			
 		}
 		
-		if(count($error_stack) > 0){
-			print("Errors occurred:");
-			print_r($error_stack);
-		}else{
-			print("Order was submitted successfully!");
+		if(count($error_stack) == 0){
+			array_push($notice_stack, "Delivery dates were submitted successfully!");
 		}
    }
  
+ 
 function getAllOrdersToProcess(){
 	global $connection;
-	$results = $connection->query("SELECT * FROM purchase");// WHERE deliveredDate IS NULL");
+	$results = $connection->query("SELECT * FROM purchase WHERE deliveredDate IS NULL");
  	
  	if($results->num_rows == 0){
-	 	print '<tr><td colspan=5>No Items Found</td></tr>';
- 	}
+	 	print '<tr><td colspan=5>No orders needing delivery dates set were found.</td></tr>';
+ 	}else{
 
- 	$i = 0;
-	while($row = $results->fetch_assoc()) {
-		print '<input type="hidden" name="updates['.$i.'][receipt]" value='.$row["p_receiptId"].'>';
-	    print '<tr>';
-		    print '<td>'.$row["p_receiptId"].'</td>';
-		    print '<td>'.$row["p_date"].'</td>';
-		    print '<td>'.$row["p_cid"].'</td>';
-		    print '<td>'.$row["expectedDate"].'</td>';
-		    if(isset($row["deliveredDate"])){
-			    print '<td>'.$row["deliveredDate"].'</td>';
-		    }else{
-		    	print '<td><input type="date" name="updates['.$i.'][date]" class="dynamic_datepicker"></td>';
-		    }
-	    print '</tr>';
-	    
-	    $i++;
-	}  
-
+	 	$i = 0;
+		while($row = $results->fetch_assoc()) {
+			print '<input type="hidden" name="updates['.$i.'][receipt]" value='.$row["p_receiptId"].'>';
+		    print '<tr>';
+			    print '<td>'.$row["p_receiptId"].'</td>';
+			    print '<td>'.date('Y-m-d', strtotime($row["p_date"])).'</td>';
+			    print '<td>'.$row["p_cid"].'</td>';
+			    print '<td>'.date('Y-m-d', strtotime($row["expectedDate"])).'</td>';
+			    print '<td><input type="date" name="updates['.$i.'][date]" class="dynamic_datepicker"></td>';
+		    print '</tr>';
+		    
+		    $i++;
+		}  
+		print'<tr><td colspan=4></td>
+		 		  <td><input type=submit value="Update Delivery Dates"></td>
+		      </tr>';
+	}
 	$results->free();
  }
  
@@ -102,9 +102,6 @@ function getAllOrdersToProcess(){
 	 
 	 <?php getAllOrdersToProcess(); ?>
 	 
-	 <tr>
-		 <td colspan=4></td>
-		 <td><input type=submit value="Update Delivery Dates"></td>
-	 </tr>
+	 
 	 </form>
  </table>
