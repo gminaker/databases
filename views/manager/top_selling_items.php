@@ -29,16 +29,17 @@ function topSellingItems($date,$count){
 	if(!$results){
 		printf("Error: %s\n", $connection->error);
 	}						
- 	
+	
  	if($results->num_rows == 0){
-	 	print '<tr><td colspan=5>No Items Found</td></tr>';
+	 	print('<table><tr><td colspan=5>No Items Found</td></tr></table>');
  	} else {
+		print('<table><tr><th>Top selling items on '.$cleanDate.'</th></tr></table>');
 
- 		print '<tr>';
-		    print '<td> Title </td>';
-		    print '<td> Company </td>';
-		    print '<td> Stock </td>';
-		    print '<td> Quantity </td>';
+ 		print '<table><tr>';
+		    print '<th> Title </th>';
+		    print '<th> Company </th>';
+		    print '<th> Stock </th>';
+		    print '<th> Quantity </th>';
 	    print '</tr>';
 
  		$i = 1;
@@ -52,6 +53,12 @@ function topSellingItems($date,$count){
 	    
 	    	$i++;
 		} 
+
+		print('</table>');
+
+		if ($i < $count){
+			print ('<tr><td colspan=5>Only '.$i.' items to diplay</td></tr>');
+		}
 	}
 
 	$results->free();
@@ -80,9 +87,12 @@ function topSellingItems($date,$count){
 	 
  if(isset($_POST['report_date'], $_POST['count'])
  	and ($_POST['report_date'] != "")
- 	and ($_POST['count'] != "")){
+ 	and (intval($_POST['count']) > 0)){
 	
 	topSellingItems($_POST['report_date'], intval($_POST['count']));
+
+ } else {
+ 	print('<tr><td colspan=5>Invalid entry, please try again. Total items must be a positive integer.</td></tr>');
  }
 
  ?>
