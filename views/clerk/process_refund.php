@@ -144,6 +144,7 @@
 	
 	function checkReceiptDisplayContents(){
 		$receiptId = $_POST["invoice_no"];
+		$oldReceipt = false;
 		
 		global $connection;
 		$stmt = $connection->prepare("SELECT * FROM purchase WHERE p_receiptId =  ?");
@@ -171,6 +172,7 @@
 		$diff = $now->diff($r_date);
 		
 		if($diff->days > 15) {
+			$oldReceipt = true;
 		    echo 'Warning: This receipt was issued more than 15 days ago';
 		}
 	    
@@ -201,6 +203,7 @@
 	    print '<tr><td colspan=3></td><td><input type="submit" value="Process Return"></td></tr>';
 	    print '</table>';
 	    
+		return $oldReceipt;
 	}  
      
 	function getAllReceiptItems($receiptId){
