@@ -18,7 +18,7 @@
       if (isset($_POST["return_receiptno"]) && $_POST["return_receiptno"] == "true") {
 		checkReceiptDisplayContents();
       }else if (isset($_POST["process_refund"]) && $_POST["process_refund"] == "true") {
-		refundItems();
+		refundItems(returned());
       }else {
 	    renderReceiptCollector();
       }
@@ -26,34 +26,97 @@
 		renderReceiptCollector();
 	}
 	
-	function refundItems(){
+	function returned(){
 		$receiptId = $_POST['receipt_id'];
 		
 		global $connection;
-	 	$stmt = $connection->prepare("INSERT INTO returnrecord (ret_date, ret_receiptId) VALUES (?,?)");
-	    
-	    // Bind the title and pub_id parameters, 'sss' indicates 3 strings
-	    $stmt->bind_param("ss", date('Y-m-d h:i:s', time()),$receiptId);
-	    
-	    // Execute the insert statement
+		$stmt = $connection->prepare("SELECT ri_upc, ri_quantity, ret_receiptId FROM returnrecord, returnitem WHERE ret_receiptId =  ? AND retId = ri_retId");
+	    $stmt->bind_param("s",  $receiptId);
 	    $stmt->execute();
 	    
-	    $error_stack = array();
+		if($stmt->error) {       
+	      printf("<b>Error: %s.</b>\n", $stmt->error);
+	    }
+	     
+	    $stmt->store_result();
+		$count = $stmt->num_rows;
+		
+		$total_quantities = array();	
+		
+		if ($count == 0) {
+			return $total_quantities;
+		}
+
+		$stmt->bind_result($upc, $qty, $recId);   
 	    
-	    // Print any errors if they occured
-	    if($stmt->error) {       
-	      array_push($error_stack, $stmt->error);
-	    }     
+	    $i=0;
+		$upcs = array();
+		if(isset($_POST['return'])){
+			foreach($_POST['return'] as $key => $value) {
+				$upcs[$i] = $value['upc'];
+				$i++;
+			}
+		}
+			
+	    while($stmt->fetch()){
+			//var_dump($upc);
+			//var_dump($recId);
+		    if (in_array($upc, $upcs)) {
+		    	print("Found a return for this item.\n");
+				//var_dump($upc);
+				if (array_key_exists($upc, $total_quantities)) {
+					$total_quantities[$upc] += $qty;
+				} else {
+					$total_quantities[$upc] = $qty;
+				}
+				
+		    }
+	    }
+		return $total_quantities;
+	}
+	
+	
+	function refundItems($total_quantities){
+		$receiptId = $_POST['receipt_id'];
+		
+		global $connection;
+		$error_stack = array();
+		
+		if(isset($_POST['return'])){
+			$firstReturn = true;
+			foreach($_POST['return'] as $key => $value) {
+			    	
+				//var_dump($value);
+				$upc = $value['upc'];
+				$purchase_qty = $value['pqty'];
+				$qty = $value['qty'];
+				if (array_key_exists($upc, $total_quantities)) {
+					printf("<br>%d items with UPC, %s, have already been returned on this receipt.</br>", $total_quantities[$upc], $upc);
+					$not_returned_qty = $purchase_qty - $total_quantities[$upc];
+				} else {
+					$not_returned_qty = $purchase_qty;
+				}
+				// var_dump($not_returned_qty);
+					
+				if ($qty > 0 && $qty <= $not_returned_qty){
+				 	if ($firstReturn) {
+					 	$stmt = $connection->prepare("INSERT INTO returnrecord (ret_date, ret_receiptId) VALUES (?,?)");
 	    
-	    $returnReceiptId = $stmt->insert_id;
+					    // Bind the title and pub_id parameters, 'sss' indicates 3 strings
+					    $stmt->bind_param("ss", date('Y-m-d h:i:s', time()),$receiptId);
 	    
-	    if(isset($_POST['return'])){
-		    foreach($_POST['return'] as $key => $value) {
-			    
-				    $upc = $value['upc'];
-				    $qty = $value['qty'];
-				    
-					if ($qty > 0){
+					    // Execute the insert statement
+					    $stmt->execute();
+
+					    // Print any errors if they occured
+					    if($stmt->error) {       
+					      array_push($error_stack, $stmt->error);
+					    }     
+	    
+					    $returnReceiptId = $stmt->insert_id;
+					    //var_dump($returnReceiptId);
+						$firstReturn = false;
+				 	}
 					  	
 					$stmt = $connection->prepare("INSERT INTO returnitem (ri_retid, ri_upc, ri_quantity) VALUES (?,?,?)");
 	
@@ -62,8 +125,13 @@
 					$stmt->execute();
 	
 					if($stmt->error) {       
-					  array_push($error_stack, $stmt->error);
-					}    
+						array_push($error_stack, $stmt->error);
+					} else if (count($error_stack) == 0){
+						print("Return processed successfully.");
+					} 
+					
+				} else {
+					printf("Sorry, can't return %d items for UPC %s.", $qty, $upc);
 				}
 			}
 		}
@@ -71,8 +139,6 @@
 		if(count($error_stack) > 0){
 			print("Errors occurred:");
 			print_r($error_stack);
-		}else{
-			print("Return was processed successfully!");
 		}	
 	}
 	
@@ -84,7 +150,7 @@
 	    $stmt->bind_param("s",  $receiptId);
 	    $stmt->execute();
 	    
-		if($results->error) {       
+		if($stmt->error) {       
 	      printf("<b>Error: %s.</b>\n", $stmt->error);
 	    }
 	     
@@ -94,13 +160,15 @@
 		$stmt->bind_result($receiptId, $date, $cid, $cardNo, $expiryDate, $expectedDate, $deliveredDate);
 		
 		if($count == 0){
-			print("Sorry bud, can't find that receipt");
+			print("Sorry bud, can't find that receipt.");
 			exit();
+		} else {
+			$stmt->fetch();
 		}
-
-		$date = new DateTime($row["p_date"]);
+		
+		$r_date = new DateTime($date);
 		$now = new DateTime();
-		$diff = $now->diff($date);
+		$diff = $now->diff($r_date);
 		
 		if($diff->days > 15) {
 		    echo 'Warning: This receipt was issued more than 15 days ago';
@@ -116,7 +184,7 @@
 		print '</tr>';
 		print '<tr>';
 			print '<td>Receipt Date:</td>';
-		    print '<td>'. date('Y-m-d' , $date->getTimestamp()) .'</td>';
+		    print '<td>'. date('Y-m-d' , $r_date->getTimestamp()) .'</td>';
 		print '</tr>';
 		print '<tr>';
 			print '<td>Customer ID:</td>';
@@ -141,7 +209,7 @@
 	    $stmt->bind_param("s",  $receiptId);
 	    $stmt->execute();
 	    
-		if($results->error) {       
+		if($stmt->error) {       
 	      printf("<b>Error: %s.</b>\n", $stmt->error);
 	    } 
 	    
@@ -156,9 +224,10 @@
 	    $i=0;
 	    while($stmt->fetch()){
 		    print '<tr><td>'.$upc.'</td>
-		    		   <input type="hidden" name="return['.$i.'][upc]">
-		    		   <td>'.getItemInfo($upc, 'it_title').'</td>
+		    		   <input type="hidden" name="return['.$i.'][upc]" value='.$upc.'>
+		    		   <td>'.getItemInfo($upc).'</td>
 		               <td>'.$quantity.'</td>
+					   <input type="hidden" name="return['.$i.'][pqty]" value='.$quantity.'>
 		               <td><input type="text" name="return['.$i.'][qty]"></td>
 		           </tr>';
 		           $i++;
@@ -166,7 +235,29 @@
 	}
 	
 	function getItemInfo($upc){
-		return $upc;
+		global $connection;
+		$stmt = $connection->prepare("SELECT * FROM item WHERE it_upc =  ?");
+	    $stmt->bind_param("s", $upc);
+	    $stmt->execute();
+	    
+		if($stmt->error) {       
+	      printf("<b>Error: %s.</b>\n", $stmt->error);
+	    }
+	     
+	    $stmt->store_result();
+		$count = $stmt->num_rows;
+
+		$stmt->bind_result($it_upc, $item_name, $type, $category, $company,
+			$year, $price, $stock);
+		
+		if($count == 0){
+			print("Sorry bud, can't find that item.\n");
+			exit();
+		} 
+		$stmt->fetch();
+
+		//var_dump($item_name);
+		return $item_name;
 	}
 	
 	function renderReceiptCollector(){
