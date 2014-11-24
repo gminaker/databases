@@ -57,7 +57,7 @@ function topSellingItems($date,$count){
 		print('</table>');
 
 		if ($i < $count){
-			print ('<tr><td colspan=5>Only '.$i.' items to diplay</td></tr>');
+			print ('<tr><td colspan=5>Only '.($i - 1).' item(s) to diplay</td></tr>');
 		}
 	}
 
@@ -86,13 +86,15 @@ function topSellingItems($date,$count){
  <?php 
 	 
  if(isset($_POST['report_date'], $_POST['count'])
- 	and ($_POST['report_date'] != "")
- 	and (intval($_POST['count']) > 0)){
+ 	and (!empty($_POST['report_date']))
+ 	and (intval($_POST['count']) > 0)
+ 	and (!empty($_POST['count']))){
 	
 	topSellingItems($_POST['report_date'], intval($_POST['count']));
 
- } else {
- 	print('<tr><td colspan=5>Invalid entry, please try again. Total items must be a positive integer.</td></tr>');
+ } else if(isset($_POST['report_date'], $_POST['count'])){
+
+ 	print('<tr><td colspan=5>Invalid entry, please try again.</td></tr>');
  }
 
  ?>
