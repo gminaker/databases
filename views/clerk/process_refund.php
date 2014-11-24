@@ -176,37 +176,41 @@
 		    echo 'Warning: This receipt was issued more than 15 days ago';
 		}
 	    
-	    print '<table>';
-	    print '<form method="post">';
-	    print '<input type="hidden" name="process_refund" value="true">';
-	    print '<input type="hidden" name="receipt_id" value="'.$receiptId.'">';
-	    print '<tr>';
-	    	print '<td>Receipt ID:</td>';
-		    print '<td>'.$receiptId.'</td>';
+		print '<table>';
+		print '<form method="post">';
+		print '<input type="hidden" name="process_refund" value="true">';
+		print '<input type="hidden" name="receipt_id" value="'.$receiptId.'">';
+		print '<tr>';
+		print '<td>Receipt ID:</td>';
+		print '<td>'.$receiptId.'</td>';
 		print '</tr>';
 		print '<tr>';
-			print '<td>Receipt Date:</td>';
-		    print '<td>'. date('Y-m-d' , $r_date->getTimestamp()) .'</td>';
+		print '<td>Receipt Date:</td>';
+		print '<td>'. date('Y-m-d' , $r_date->getTimestamp()) .'</td>';
 		print '</tr>';
 		print '<tr>';
-			print '<td>Customer ID:</td>';
-		    print '<td>'.$cid.'</td>';
+		print '<td>Customer ID:</td>';
+		print '<td>'.$cid.'</td>';
 		print '</tr>';
 		print '<tr>';
-			print '<td>Delivery Date:</td>';
-		    print '<td>'.$deliveredDate.'</td>';
-	    print '</tr>
-	    	   <tr><th>UPC</th><th>Title</th><th>Order QTY</th><th>Return QTY</th></tr>';
+		print '<td>Delivery Date:</td>';
+		print '<td>'.$deliveredDate.'</td>';		
+		print '</tr>';
+		if (!$oldReceipt) {
+			print '<tr><th>UPC</th><th>Title</th><th>Order QTY</th><th>Return QTY</th></tr>';
+		} else {
+			print '<tr><th>UPC</th><th>Title</th><th>Order QTY</th>/tr>';
+		}
 	    
-	    getAllReceiptItems($receiptId);
+	    getAllReceiptItems($receiptId, $oldReceipt);
 	    
-	    print '<tr><td colspan=3></td><td><input type="submit" value="Process Return"></td></tr>';
+		if (!$oldReceipt) {
+	    	print '<tr><td colspan=3></td><td><input type="submit" value="Process Return"></td></tr>';
+		}
 	    print '</table>';
-	    
-		return $oldReceipt;
 	}  
      
-	function getAllReceiptItems($receiptId){
+	function getAllReceiptItems($receiptId, $oldReceipt){
 		global $connection;
 		$stmt = $connection->prepare("SELECT * FROM purchaseitem WHERE pi_receiptId =  ?");
 	    $stmt->bind_param("s",  $receiptId);
@@ -226,14 +230,17 @@
 		}
 	    $i=0;
 	    while($stmt->fetch()){
-		    print '<tr><td>'.$upc.'</td>
-		    		   <input type="hidden" name="return['.$i.'][upc]" value='.$upc.'>
-		    		   <td>'.getItemInfo($upc).'</td>
-		               <td>'.$quantity.'</td>
-					   <input type="hidden" name="return['.$i.'][pqty]" value='.$quantity.'>
-		               <td><input type="text" name="return['.$i.'][qty]"></td>
-		           </tr>';
-		           $i++;
+			print '<tr><td>'.$upc.'</td>
+				<input type="hidden" name="return['.$i.'][upc]" value='.$upc.'>
+			<td>'.getItemInfo($upc).'</td>
+			<td>'.$quantity.'</td>
+			<input type="hidden" name="return['.$i.'][pqty]" value='.$quantity.'>';
+			if (!$oldReceipt) {
+				print '<td><input type="text" name="return['.$i.'][qty]"></td>';
+			}
+		               
+			print '</tr>';
+			$i++;
 	    }
 	}
 	
