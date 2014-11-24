@@ -30,14 +30,14 @@ function generateDailySalesReport($date){
 	}						
  	
  	if($results->num_rows == 0){
-	 	print '<tr><td colspan=5>No Items Found</td></tr>';
+	 	print '<table><tr><td colspan=5>No Items Found</td></tr></table>';
  	} else {
- 		print '<tr><td colspan=5>Report for: '.$date.'</td></tr><tr></tr>';
-	 	print '<tr>	<td>UPC</td>
-	 				<td>Category</td>
- 				<td>Unit Price</td>
- 				<td>Units</td>
- 				<td>Total Value</td>
+ 		print '<table><tr><td colspan=5>Report for: '.$date.'</td></tr><tr></tr>';
+	 	print '<tr>	<th>UPC</th>
+	 				<th>Category</th>
+ 				<th>Unit Price</th>
+ 				<th>Units</th>
+ 				<th>Total Value</th>
  			</tr>';
 
  		$i = 0;
@@ -87,7 +87,7 @@ function generateDailySalesReport($date){
 		    	print '<td></td>';
 		    	print '<td>'.$gtotalunits.'</td>';
 		    	print '<td>'.$gtotalvalue.'</td>';
-	    	print '</tr>';
+	    	print '</tr></table>';
 		} 
 	}
 

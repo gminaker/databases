@@ -1,3 +1,11 @@
+table, table td{
+	border:0px;
+}
+
+table th{
+	background-color: grey;
+}
+
 
 h2 {
     font-size: 1.1em;
@@ -5,7 +13,8 @@ h2 {
     margin:0px;
 }
 #container {
-	max-width: 800px;
+	width: 800px;
+	display: table;
 	margin-left: auto;
     margin-right: auto;
     box-shadow: 0px 0px 20px #888888;
@@ -13,14 +22,14 @@ h2 {
 }
 
 #errors {
-	background-color: red;
+	background-color: lightcoral;
 	padding:5px;
 	border: 1px solid;
     border-radius: 10px;
 }
 
 #notices {
-	background-color: yellow;
+	background-color: lightyellow;
 	padding:5px;
 	border: 1px solid;
     border-radius: 10px;
@@ -61,9 +70,11 @@ h2 {
     float:left;
     padding:10px;	 	 
 }
+
 #content table{
 	width:100%;
 }
+
 #footer {
     background-color:grey;
     color:white;
