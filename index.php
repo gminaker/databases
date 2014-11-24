@@ -16,115 +16,38 @@
  * @version    1.0
  *
  */
+ 
+ $error_stack = array();
+ $notice_stack = array();
 
-// Start a session to force the user to login
-session_start();
+include_once('etc/db_connection.php');
+include_once('etc/login_functionality.php');
+include_once('etc/dynamic_content_display.php');
 
-$_SESSION['user_id'];
-$_SESSION['cart'];
-
-// Open a connection to the database
-$connection = new mysqli("localhost", "root", "", "test");
-
-if(isset($_POST['login_id']) && isset($_POST['login_pass'])){
-	loginUser($_POST['login_id'], $_POST['login_pass']);
-}
-
-function loginUser($id, $pass){
-	global $connection;
-	$stmt = $connection->prepare("SELECT c_password FROM customer WHERE cid =  ?");
-    $stmt->bind_param("s",  $id);
-    $stmt->execute();
-    
-	if($results->error) {       
-      printf("<b>Error: %s.</b>\n", $stmt->error);
-    }
-     
-    $stmt->store_result();
-	$count = $stmt->num_rows;
-	$stmt->bind_result($db_pass);
-	$stmt->fetch();
-	
-	if($id == "test" && $pass == "test"){
-		$_SESSION['user_id'] = $id;
-		print 'Welcome to the site!';
-	}else if($count == 0){
-		echo 'This username does not exist';
-	}else {
-		
-		if($pass == $db_pass){
-			$_SESSION['user_id'] = $id;
-			print 'Welcome to the site!';
-		}else{
-			print 'incorrect password. please try again.';
+function displayNotices(){
+	global $notice_stack;
+	if(is_array($notice_stack) && count($notice_stack) > 0){
+		print '<div id="notices">';
+		foreach($notice_stack as $notice){
+			print '<b>Notice:</b> ' . $notice;
+			unset($notice);
 		}
-	}	
-}
-
-if(isset($_GET['logout']) && $_GET['logout'] == true){
-	$_SESSION['user_id'] = null;
-	$_SESSION['cart'] = null;
-}
-
-// Check that the connection was successful, otherwise exit
-if (mysqli_connect_errno()) {
-    printf("Connect failed: %s\n", mysqli_connect_error());
-    exit();
-}
-    
- /**
- *
- * Gets the content for the current page. The current page
- * is specified in the URL 'page' variable. 
- *
- */
-function getContent(){
-
-	if(isset($_GET['page']) && isset($_SESSION['user_id'])){
-	
-		  switch ($_GET['page']) {
-		  
-		  case "user_reg":
-		    include('views/customer/customer_reg.php');
-		    break;
-		    
-		  case "purchase":
-		    include('views/customer/purchase_items.php');
-		    break;
-		    
-		  case "return":
-		    include('views/clerk/process_refund.php');
-		    break;
-		    
-		  case "add_items":
-		    include('views/manager/add_items.php');
-		    break;
-		    
-		  case "process_delivery":
-		    include('views/manager/process_delivery.php');
-		    break;
-		    
-		  case "sales_report":
-		    include('views/manager/sales_report.php');
-		    break;
-		    
-		   case "top_selling_items":
-		    include('views/manager/top_selling_items.php');
-		    break;
-		    
-		  default:
-		    include('views/default.php');
-		}
-		
-	}else if(!isset($_SESSION['user_id']) && isset($_GET['page']) && $_GET['page'] == 'user_reg'){
-		include('views/customer/customer_reg.php');
-	}else if(isset($_SESSION['user_id'])){
-		include('views/default.php');
-	}else{
-		include('views/login.php');
+		print '</div>';
 	}
-	
 }
+
+function displayErrors(){
+	global $error_stack;
+	if(is_array($error_stack) && count($error_stack) > 0){
+		print '<div id="errors">';
+		foreach($error_stack as $error){
+			print '<b>Error:</b> ' . $error;
+			unset($error);
+		}
+		print '</div>';
+	}
+}
+    
 ?>
 
 <!-- PAGE DISPLAY STARTS HERE -->
@@ -133,9 +56,9 @@ function getContent(){
 		<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
 		<meta content="utf-8" http-equiv="encoding">
 		
-		<link rel="stylesheet" href="jquery-ui-1.11.2/jquery-ui.min.css"  type="text/css" >
-		<script src="jquery-ui-1.11.2/external/jquery/jquery.js"></script>
-		<script src="jquery-ui-1.11.2/jquery-ui.min.js"></script>
+		<link rel="stylesheet" href="js/jquery-ui-1.11.2/jquery-ui.min.css"  type="text/css" >
+		<script src="js/jquery-ui-1.11.2/external/jquery/jquery.js"></script>
+		<script src="js/jquery-ui-1.11.2/jquery-ui.min.js"></script>
 		<script src="js/datepicker.js"></script>
 	
 		<title>Online Store V1</title>
@@ -145,46 +68,58 @@ function getContent(){
 	</head>
 	
 	<body>
-		<table>
-		<tr>
-			<td colspan="5"> Online Store 1.0</td>
-		</tr>
+		<div id="container">
+		<div id="header">
+		<h1>Online Store V2</h1>
+		</div>
+		<div id="nav">
 		<?php 
 		if(isset($_SESSION['user_id'])){
 			?>
-			<tr>
-				<td>Customers:</td>
-				<td><a href="?page=user_reg">Registration</a></td>
-				<td colspan="3"><a href="?page=purchase">Purchase</a></td>
-				<td colspan="3"><a href="?logout=true">Logout</a></td>
-			</tr>
-			<tr>
-				<td>Clerks:</td>
-				<td><a href="?page=return">Return Item</a></td>
-			</tr>
-			<tr>
-				<td>Managers:</td>
-				<td><a href="?page=add_items">Add Items</a></td>
-				<td><a href="?page=process_delivery">Process Delivery</a></td>
-				<td><a href="?page=sales_report">Daily Sales Report</a></td>
-				<td><a href="?page=top_selling_items">Top Selling Items</a></td>
-			</tr>
+			
+				<h2>Customers</h2>
+				<ul>
+				<li><a href="?page=user_reg">Registration</a></li>
+				<li><a href="?page=purchase">Purchase</a></li>
+				<li><a href="?logout=true">Logout</a></li>
+				</ul>
+
+				<h2>Clerks</h2>
+				<ul>
+				<li><a href="?page=return">Return Item</a></li>
+				</ul>
+			
+				<h2>Managers:</h2>
+				<ul>
+				<li><a href="?page=add_items">Add Items</a></li>
+				<li><a href="?page=process_delivery">Process Delivery</a></li>
+				<li><a href="?page=sales_report">Daily Sales Report</a></li>
+				<li><a href="?page=top_selling_items">Top Selling Items</a></li>
+				</ul>
 
 			<?php
 		}else{
 			?>
-			<tr>
-				<td>Customers:</td>
-				<td><a href="?page=user_reg">Registration</a></td>
-				<td colspan="3"><a href="/">Login</a></td>
-			</tr>
+			
+				<h2>Customers:</h2>
+				<ul>
+				<li><a href="?page=user_reg">Registration</a></li>
+				<li><a href="/">Login</a></li>
+				</ul>
 			<?php
 		}
+		
 		?>
-				<tr>
-			<td colspan="5"><?php getContent(); ?></td>
-		</tr>
-		</table>
+		</div>
+		<div id="content">
+					<?php displayErrors(); ?>
+					<?php displayNotices(); ?>
+			<?php getContent(); ?>
+		</div>
+		<div id="footer">
+			Footer Message
+		</div>
+		</div>
 	</body>
 	
 </html>

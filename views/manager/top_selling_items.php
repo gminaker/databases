@@ -65,8 +65,12 @@ function topSellingItems($date,$count){
 	 <tr>
 		 <td>Enter Date:</td>
 		 <td><input type=date name="report_date" class="dynamic_datepicker"></td>
+	 </tr>
+	 <tr>
 		 <td>Enter Total items:</td>
 		 <td><input type="text" name="count"></td>
+	 </tr>
+	 <tr><td></td>
 		 <td><input type=submit value="Get top selling items"></td>
 	 </tr>
  </table>
