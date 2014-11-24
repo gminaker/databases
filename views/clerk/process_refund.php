@@ -91,7 +91,7 @@
 				$purchase_qty = $value['pqty'];
 				$qty = $value['qty'];
 				if (array_key_exists($upc, $total_quantities)) {
-					printf("<br>%d items with UPC, %s, have already been returned on this receipt.</br>", $total_quantities[$upc], $upc);
+					printf("<br>%d of UPC, %s, have/has already been returned on this receipt.</br>", $total_quantities[$upc], $upc);
 					$not_returned_qty = $purchase_qty - $total_quantities[$upc];
 				} else {
 					$not_returned_qty = $purchase_qty;
@@ -131,7 +131,7 @@
 					} 
 					
 				} else {
-					printf("Sorry, can't return %d items for UPC %s.", $qty, $upc);
+					printf("Sorry, can't return %d UPC %s.", $qty, $upc);
 				}
 			}
 		}
