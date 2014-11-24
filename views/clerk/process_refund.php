@@ -18,10 +18,7 @@
       if (isset($_POST["return_receiptno"]) && $_POST["return_receiptno"] == "true") {
 		checkReceiptDisplayContents();
       }else if (isset($_POST["process_refund"]) && $_POST["process_refund"] == "true") {
-		  if(!returned()){
-		  	refundItems();
-		  }
-		
+		refundItems(returned());
       }else {
 	    renderReceiptCollector();
       }
@@ -44,8 +41,10 @@
 	    $stmt->store_result();
 		$count = $stmt->num_rows;
 		
+		$total_quantities = array();	
+		
 		if ($count == 0) {
-			return false;
+			return $total_quantities;
 		}
 
 		$stmt->bind_result($upc, $qty, $recId);   
@@ -58,50 +57,66 @@
 				$i++;
 			}
 		}
-				
+			
 	    while($stmt->fetch()){
 			//var_dump($upc);
 			//var_dump($recId);
 		    if (in_array($upc, $upcs)) {
-		    	print("This item has already been returned on this receipt.");
-				return true;
+		    	print("Found a return for this item.\n");
+				//var_dump($upc);
+				if (array_key_exists($upc, $total_quantities)) {
+					$total_quantities[$upc] += $qty;
+				} else {
+					$total_quantities[$upc] = $qty;
+				}
+				
 		    }
 	    }
-		return false;
+		return $total_quantities;
 	}
 	
 	
-	function refundItems(){
+	function refundItems($total_quantities){
 		$receiptId = $_POST['receipt_id'];
 		
 		global $connection;
-	 	$stmt = $connection->prepare("INSERT INTO returnrecord (ret_date, ret_receiptId) VALUES (?,?)");
-	    
-	    // Bind the title and pub_id parameters, 'sss' indicates 3 strings
-	    $stmt->bind_param("ss", date('Y-m-d h:i:s', time()),$receiptId);
-	    
-	    // Execute the insert statement
-	    $stmt->execute();
-	    
-	    $error_stack = array();
-	    
-	    // Print any errors if they occured
-	    if($stmt->error) {       
-	      array_push($error_stack, $stmt->error);
-	    }     
-	    
-	    $returnReceiptId = $stmt->insert_id;
-	    var_dump($returnReceiptId);
+		$error_stack = array();
 		
 		if(isset($_POST['return'])){
+			$firstReturn = true;
 			foreach($_POST['return'] as $key => $value) {
 			    	
-				var_dump($value);
+				//var_dump($value);
 				$upc = $value['upc'];
 				$purchase_qty = $value['pqty'];
 				$qty = $value['qty'];
+				if (array_key_exists($upc, $total_quantities)) {
+					printf("<br>%d items with UPC, %s, have already been returned on this receipt.</br>", $total_quantities[$upc], $upc);
+					$not_returned_qty = $purchase_qty - $total_quantities[$upc];
+				} else {
+					$not_returned_qty = $purchase_qty;
+				}
+				// var_dump($not_returned_qty);
 					
-				if ($qty > 0 && $qty <= $purchase_qty){
+				if ($qty > 0 && $qty <= $not_returned_qty){
+				 	if ($firstReturn) {
+					 	$stmt = $connection->prepare("INSERT INTO returnrecord (ret_date, ret_receiptId) VALUES (?,?)");
+	    
+					    // Bind the title and pub_id parameters, 'sss' indicates 3 strings
+					    $stmt->bind_param("ss", date('Y-m-d h:i:s', time()),$receiptId);
+	    
+					    // Execute the insert statement
+					    $stmt->execute();
+
+					    // Print any errors if they occured
+					    if($stmt->error) {       
+					      array_push($error_stack, $stmt->error);
+					    }     
+	    
+					    $returnReceiptId = $stmt->insert_id;
+					    //var_dump($returnReceiptId);
+						$firstReturn = false;
+				 	}
 					  	
 					$stmt = $connection->prepare("INSERT INTO returnitem (ri_retid, ri_upc, ri_quantity) VALUES (?,?,?)");
 	
@@ -111,9 +126,12 @@
 	
 					if($stmt->error) {       
 						array_push($error_stack, $stmt->error);
-					}    
+					} else if (count($error_stack) == 0){
+						print("Return processed successfully.");
+					} 
+					
 				} else {
-					array_push($error_stack, "Sorry, can't return that number of items.");
+					printf("Sorry, can't return %d items for UPC %s.", $qty, $upc);
 				}
 			}
 		}
@@ -121,8 +139,6 @@
 		if(count($error_stack) > 0){
 			print("Errors occurred:");
 			print_r($error_stack);
-		}else{
-			print("Return was processed successfully!");
 		}	
 	}
 	
@@ -144,7 +160,7 @@
 		$stmt->bind_result($receiptId, $date, $cid, $cardNo, $expiryDate, $expectedDate, $deliveredDate);
 		
 		if($count == 0){
-			print("Sorry bud, can't find that receipt");
+			print("Sorry bud, can't find that receipt.");
 			exit();
 		} else {
 			$stmt->fetch();
