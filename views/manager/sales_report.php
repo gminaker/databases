@@ -34,14 +34,15 @@ function generateDailySalesReport($raw_date){
  	if($results->num_rows == 0){
 	 	print('No sales records found for '.$raw_date);
  	} else {
- 		print '<table><tr><th colspan=5>Report for: '.$date.'</th></tr><tr></tr>';
-	 	print '<tr>	<th>UPC</th>
-	 				<th>Category</th>
+ 		print '<table><tr><th colspan=5>Report for: '.$date.'</th></tr>';
+	 	print '<tr>	
+	 			<th>UPC</th>
+	 			<th>Category</th>
  				<th>Unit Price</th>
  				<th>Units</th>
  				<th>Total Value</th>
- 			</tr>';
-
+ 			   </tr>';
+ 			
  		$i = 0;
  		$category = "";
  		$totalunits = 0;
