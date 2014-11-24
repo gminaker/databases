@@ -3,8 +3,6 @@
 // Start a session to force the user to login
 session_start();
 
-$_SESSION['user_id'];
-$_SESSION['cart'];
 
 if(isset($_POST['login_id']) && isset($_POST['login_pass'])){
 	loginUser($_POST['login_id'], $_POST['login_pass']);
