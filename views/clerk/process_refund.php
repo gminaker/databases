@@ -152,7 +152,7 @@
 	    $stmt->execute();
 	    
 		if($stmt->error) {       
-	      printf("<b>Error: %s.</b>\n", $stmt->error);
+	      printf("<b>Error: %s.</b><br />", $stmt->error);
 	    }
 	     
 	    $stmt->store_result();
@@ -199,7 +199,7 @@
 		if (!$oldReceipt) {
 			print '<tr><th>UPC</th><th>Title</th><th>Order QTY</th><th>Return QTY</th></tr>';
 		} else {
-			print '<tr><th>UPC</th><th>Title</th><th>Order QTY</th>/tr>';
+			print '<tr><th>UPC</th><th>Title</th><th>Order QTY</th></tr>';
 		}
 	    
 	    getAllReceiptItems($receiptId, $oldReceipt);
