@@ -84,6 +84,10 @@
 		
 		if(isset($_POST['return'])){
 			$firstReturn = true;
+			$all_ok = true;
+			$connection->autocommit(FALSE);
+			$connection->begin_transaction();
+			
 			foreach($_POST['return'] as $key => $value) {
 			    	
 				//var_dump($value['qty']);
@@ -126,6 +130,8 @@
 	
 					if($stmt->error) {       
 						array_push($error_stack, $stmt->error);
+						$connection->rollback();
+						break;
 					} else if (count($error_stack) == 0){
 						printf("<br>Return processed successfully for: %d, of UPC: %s</br>", $qty, $upc);
 					} 
@@ -136,6 +142,8 @@
 					printf("<br>Sorry, can't return %d of UPC: %s.</br>", $qty, $upc);
 				}
 			}
+			$connection->commit();			
+			$connection->autocommit(TRUE);
 		}
 		
 		if(count($error_stack) > 0){
