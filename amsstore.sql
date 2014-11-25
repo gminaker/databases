@@ -52,7 +52,7 @@ create table customer
 drop table if exists purchase;
  
 create table purchase
-	(p_receiptId int not null, -- What type should this be?
+	(p_receiptId int not null auto_increment, -- What type should this be?
 	p_date DATETIME not null,
 	p_cid varchar(20) not null,
 	cardNo char(16) not null,
