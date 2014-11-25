@@ -126,7 +126,9 @@ on returnrecord (retId);
 create unique index returnitemindex 
 on returnitem (ri_retId, ri_upc);
 
-ALTER TABLE item ADD FULLTEXT ft_ind (it_upc, it_title, type, category, company);
+ALTER TABLE item ADD FULLTEXT ft_item_ind (it_upc, it_title, type, category, company);
+
+ALTER TABLE leadsinger ADD FULLTEXT ft_ls_ind (ls_name);
  
 insert into item
 values('123456789012', 'Beyonce', 'cd','pop', 'Rocafella', 2014, 9.99, 12);

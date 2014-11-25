@@ -11,13 +11,14 @@
 	function returnQuickSearchResults(){
 		
 		$search_query = $_POST['quick_search'];
-		
+
 		global $connection;
  	    $results = $connection->query("	SELECT * 
-										FROM item 
-										WHERE MATCH (it_upc, it_title, type, category, company) 
-										AGAINST ('+$search_query*' IN BOOLEAN MODE)
-										OR year like '%$search_query%';");
+										FROM item, leadsinger
+										WHERE ls_upc = it_upc AND 
+										(MATCH (it_upc, it_title, type, category, company) AGAINST ('+$search_query*' IN BOOLEAN MODE)
+										OR MATCH (ls_name) AGAINST('+$search_query*' IN BOOLEAN MODE)
+										OR year like '%$search_query%');");
 	 								 
 		if(!$results) {       
 
@@ -39,6 +40,7 @@
 		    		print '<th>Year</th>';
 		    		print '<th>Price</th>';
 		    		print '<th>Stock</th>';
+		    		print '<th>Lead Singer</th>';
 		    		print '<th>Qty</th>';
 		    		print '<th>Add to cart</th>';
 	    		print '</tr>';
@@ -56,6 +58,7 @@
 		    		print '<td>'.$row["year"].'</td>';
 		    		print '<td>'.$row["price"].'</td>';
 		    		print '<td>'.$row["stock"].'</td>';
+		    		print '<td>'.$row["ls_name"].'</td>';
 		    		print '<form name="add_to_cart" method="post" action="?page=view_cart">';
 		    		print '<input type="hidden" name="add_to_cart" value="true">';
 		    		print '<input type="hidden" size="5" name="cart_upc" value="'.$row["it_upc"].'">';
@@ -79,14 +82,15 @@
 		$title = $_POST['title'];
 		$item_type = $_POST['item_type'];
 		$item_category = $_POST['item_category'];
+		$ls = $_POST['ls'];
 		$year = $_POST['year'];
 
 		$like = "";
 
-		if (!empty($upc)){
+		if (is_numeric($upc) and !empty($upc)){
 			$like .= " AND it_upc like '%$upc%'"; 
 		}
-		if (!empty($title)){
+		if (!empty($title) and $title != " "){
 			$like .= " AND it_title like '%$title%'"; 
 		}
 		if (!empty($item_type)){
@@ -95,17 +99,19 @@
 		if (!empty($item_category)){
 			$like .= " AND category like '%$item_category%'";
 		}
-		if (!empty($year)){
+		if (is_numeric($year) and (!empty($year) or $year == 0)){
 			$like .= " AND year like '%$year%'";
 		}
+		if (!empty($ls) and $ls != " "){
+			$like .= " AND ls_name like '%$ls%'";
+		}
 		if (!empty($like)){
-			$prefix = ' AND ';
-			$query = substr($like, strlen($prefix));
 
 			global $connection;
  	    	$results = $connection->query("	SELECT * 
-											FROM item 
-											WHERE $query;");
+											FROM item, leadsinger
+											WHERE ls_upc = it_upc
+											$like;");
 
  	    	if(!$results) {       
 
@@ -127,7 +133,7 @@
 		    			print '<th>Company</th>';
 		    			print '<th>Year</th>';
 		    			print '<th>Price</th>';
-		    			print '<th>Stock</th>';
+		    			print '<th>Lead Singer</th>';
 	    			print '</tr>';
 
 
@@ -144,6 +150,7 @@
 		    			print '<td>'.$row["year"].'</td>';
 		    			print '<td>'.$row["price"].'</td>';
 		    			print '<td>'.$row["stock"].'</td>';
+		    			print '<td>'.$row["ls_name"].'</td>';
 	    			print '</tr>';
 	    
 	    			$i++;
@@ -214,6 +221,11 @@
 			<tr>
 				<th>Year</th>
 				<td><input type="text" name="year"></td>
+			</tr>
+			<tr>
+			<tr>
+				<th>Lead Singer</th>
+				<td><input type="text" name="ls"></td>
 			</tr>
 			<tr>
 				<td></td>
