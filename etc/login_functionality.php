@@ -3,7 +3,6 @@
 // Start a session to force the user to login
 session_start();
 
-
 if(isset($_POST['login_id']) && isset($_POST['login_pass'])){
 	loginUser($_POST['login_id'], $_POST['login_pass']);
 }
