@@ -27,7 +27,8 @@
 			}else{
 				$key = $_POST['cart_upc'];
 				$qty = $_POST['cart_qty'];
-				$_SESSION['cart'][$key] = $qty;
+				$_SESSION['cart'][$key] += $qty;
+
 			}
 		}
     }
