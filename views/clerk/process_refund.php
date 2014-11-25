@@ -62,7 +62,7 @@
 			//var_dump($upc);
 			//var_dump($recId);
 		    if (in_array($upc, $upcs)) {
-		    	print("Found a return for this item.\n");
+		    	//print("Found a return for this item.\n");
 				//var_dump($upc);
 				if (array_key_exists($upc, $total_quantities)) {
 					$total_quantities[$upc] += $qty;
