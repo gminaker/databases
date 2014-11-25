@@ -1,44 +1,79 @@
 <?php
-	
 	if ($_SERVER["REQUEST_METHOD"] == "POST") {
-		
-		if($_POST['search_type'] == 'quick'){
-			returnQuickSearchResults();
-		}else if($_POST['search_type'] == 'advanced'){
-			returnAdvancedSearchResults();
-		}
+			if(isset($_POST["search_type"]) && $_POST['search_type'] == 'quick'){
+				returnQuickSearchResults();
+			}else if(isset($_POST["search_type"]) && $_POST['search_type'] == 'advanced'){
+				returnAdvancedSearchResults();
+			}
+	} else { returnSearchPage();
 	}
-	
+
 	function returnQuickSearchResults(){
 		
 		$search_query = $_POST['quick_search'];
 		
 		global $connection;
- 	    $results = $connection->query("SELECT * 
-	 								  FROM item 
-	 								  WHERE MATCH (it_upc, it_title, type, category, company, year) 
-	 								  AGAINST ('$search_query')");
+ 	    $results = $connection->query("	SELECT * 
+										FROM item 
+										WHERE MATCH (it_upc, it_title, type, category, company) 
+										AGAINST ('+$search_query*' IN BOOLEAN MODE)
+										OR year like '%$search_query%';");
 	 								 
 		if(!$results) {       
-	 		printf("<b>Error</b>");
+
+	 		printf("<b>Error: please attempt again</b>");
+	 		returnSearchPage();
+
     	} else {
-			echo "<b>Successfully Executed</b>";
-			print_r($results);
-    	} 
-    	
-		while($row = $results->fetch_assoc()) {
-			
-		}
-		
- 	
- 		    
+
+    		print '<table>';
+
+    			print'<tr><th>Results:</th></tr>';
+
+    			print '<tr>';
+			    	print '<th>Quantity</th>';
+		    		print '<th>UPC</th>';
+		    		print '<th>Title</th>';
+		    		print '<th>Type</th>';
+		    		print '<th>Category</th>';
+		    		print '<th>Company</th>';
+		    		print '<th>Year</th>';
+		    		print '<th>Price</th>';
+		    		print '<th>Stock</th>';
+	    		print '</tr>';
+
+
+ 			$i = 0;
+			while($row = $results->fetch_assoc()) {
+	   			print '<tr>';
+			    	print '<td><input type="text" size="5" name="purchase['.$i.'][qty]"></td>';
+		    		print '<input type="hidden" size="5" name="purchase['.$i.'][upc]" value="'.$row["it_upc"].'">';
+		    		print '<td>'.$row["it_upc"].'</td>';
+		    		print '<td>'.$row["it_title"].'</td>';
+		    		print '<td>'.$row["type"].'</td>';
+		    		print '<td>'.$row["category"].'</td>';
+		    		print '<td>'.$row["company"].'</td>';
+		    		print '<td>'.$row["year"].'</td>';
+		    		print '<td>'.$row["price"].'</td>';
+		    		print '<td>'.$row["stock"].'</td>';
+	    		print '</tr>';
+	    
+	    		$i++;
+			}  
+    		print '</table>';
+
+
+			$results->free();
+
+    	}	    
     	
 	}
 	
 	function returnAdvancedSearchResults(){
 		
 	}
-	
+
+function returnSearchPage(){
 ?>
 	
 	
@@ -65,7 +100,7 @@
 			</tr>
 			<tr>
 				<th>Type</th>
-				<td style="text-align: right">
+				<td style="text-align: left">
 					<select name="item_type">
 					 	<option value="">Select...</option>
 					 	<option value="cd">CD</option>
@@ -75,7 +110,7 @@
 			</tr>
 			<tr>
 				<th>Category</th>
-				<td style="text-align: right">
+				<td style="text-align: left">
 					<select name="item_category">
 						 <option value="">Select...</option>
 						 <option value="rock">Rock</option>
@@ -98,3 +133,7 @@
 			</tr>
 		</table>
 	</form>
+
+<?php 
+}
+?>
