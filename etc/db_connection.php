@@ -1,6 +1,6 @@
 <?php
 // Open a connection to the database
-$connection = new mysqli("localhost", "root", "", "test");
+$connection = new mysqli("localhost", "root", "", "amsstore");
 
 // Check that the connection was successful, otherwise exit
 if (mysqli_connect_errno()) {
