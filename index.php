@@ -25,10 +25,6 @@ include_once('etc/db_connection.php');
 include_once('etc/login_functionality.php');
 include_once('etc/dynamic_content_display.php');
 
- 
-$_SESSION['cart'] = array('123456789012' => 2,
-					      '288933147766' => 7);
-
 function displayNotices(){
 	global $notice_stack;
 	if(is_array($notice_stack) && count($notice_stack) > 0){

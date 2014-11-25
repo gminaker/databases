@@ -11,6 +11,7 @@
  * @since    2.0
  *
  */
+ global $connection;
  
   if ($_SERVER["REQUEST_METHOD"] == "POST") {
  		
@@ -27,6 +28,25 @@
 			}else{
 				$key = $_POST['cart_upc'];
 				$qty = $_POST['cart_qty'];
+				
+				if(isset($_SESSION['cart'][$key])){
+					$current_cart_qty = $_SESSION['cart'][$key];
+				}else{
+					$current_cart_qty = 0;
+				}
+				
+				$result = $connection->query("SELECT * FROM item WHERE it_upc = $key");
+				$row = $result->fetch_assoc();
+				$max = $row['stock'];
+				
+				$proposed_cart_qty = $current_cart_qty + $qty;
+				
+				if($proposed_cart_qty > $max){
+					$new_qty = $qty - ($proposed_cart_qty - $max);
+					print 'Sorry, we don\'t have '.$qty.' of those in stock. We\'ve added '.$new_qty.' instead.';
+					$qty = $new_qty;
+				}
+				
 				$_SESSION['cart'][$key] += $qty;
 
 			}
