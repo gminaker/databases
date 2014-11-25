@@ -86,7 +86,7 @@
 			$firstReturn = true;
 			foreach($_POST['return'] as $key => $value) {
 			    	
-				//var_dump($value);
+				//var_dump($value['qty']);
 				$upc = $value['upc'];
 				$purchase_qty = $value['pqty'];
 				$qty = $value['qty'];
@@ -127,11 +127,13 @@
 					if($stmt->error) {       
 						array_push($error_stack, $stmt->error);
 					} else if (count($error_stack) == 0){
-						print("Return processed successfully.");
+						printf("<br>Return processed successfully for: %d, of UPC: %s</br>", $qty, $upc);
 					} 
 					
+				} else if ($qty == ""){
+					// No return attempted.
 				} else {
-					printf("Sorry, can't return %d UPC %s.", $qty, $upc);
+					printf("<br>Sorry, can't return %d of UPC: %s.</br>", $qty, $upc);
 				}
 			}
 		}
@@ -161,7 +163,7 @@
 		$stmt->bind_result($receiptId, $date, $cid, $cardNo, $expiryDate, $expectedDate, $deliveredDate);
 		
 		if($count == 0){
-			print("Sorry bud, can't find that receipt.");
+			print("Sorry bud, can't find that receipt.\n");
 			exit();
 		} else {
 			$stmt->fetch();

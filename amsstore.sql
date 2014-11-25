@@ -358,7 +358,13 @@ insert into purchaseitem
 values('3001', '616402673105', 1);
 
 insert into purchaseitem
-values('3015', '213469245706', 1);
+values('3001', '213469245706', 3);
+
+insert into purchaseitem
+values('3001', '976135610258', 1);
+
+insert into purchaseitem
+values('3015', '976135610258', 5);
 
 insert into returnrecord
 values('2365', 20140719, '3216');
