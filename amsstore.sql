@@ -1,4 +1,4 @@
-use amsstore;
+use test;
 drop table if exists item;
 create table item
 	(it_upc char(12) not null,
@@ -125,6 +125,8 @@ on returnrecord (retId);
 
 create unique index returnitemindex 
 on returnitem (ri_retId, ri_upc);
+
+ALTER TABLE item ADD FULLTEXT ft_ind (it_upc, it_title, type, category, company);
  
 insert into item
 values('123456789012', 'Beyonce', 'cd','pop', 'Rocafella', 2014, 9.99, 12);
