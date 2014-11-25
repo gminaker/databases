@@ -92,7 +92,6 @@ function displayErrors(){
 				<h2>Customers</h2>
 				<ul>
 				<li><a href="?page=view_cart">View Cart</a></li>
-				<li><a href="?page=purchase">Purchase</a></li>
 				<li><a href="?logout=true">Logout</a></li>
 				</ul>
 
