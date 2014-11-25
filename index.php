@@ -20,9 +20,14 @@
  $error_stack = array();
  $notice_stack = array();
 
+
 include_once('etc/db_connection.php');
 include_once('etc/login_functionality.php');
 include_once('etc/dynamic_content_display.php');
+
+ 
+$_SESSION['cart'] = array('123456789012' => 2,
+					      '288933147766' => 7);
 
 function displayNotices(){
 	global $notice_stack;
@@ -75,6 +80,7 @@ function displayErrors(){
 		<div id="nav">
 			<h2>Item Search</h2>
 			<form name="item_search" method="post" action="?page=advanced_search">
+		    <input type="hidden" name="search_type" value="quick">
 			<input name="quick_search" type="search" size="12">
 			<input type="submit" value="Go">
 			</form>
