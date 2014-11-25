@@ -41,7 +41,7 @@ function calculateExpectedDate(){
 	$deliveries_per_day = 5;
 	$result = getMaxExpectedDate();
 	
-	if ($result['count'] < 5) {
+	if ($result['count'] < $deliveries_per_day) {
 		$expectedDate = $result['expectedDate'];
 	} else {
 		$expectedDate = $result['expectedDate']->add(new DateInterval('P1D'));
@@ -52,33 +52,38 @@ function calculateExpectedDate(){
 
 function getMaxExpectedDate(){
 	global $connection;
-	$stmt = $connection->query("SELECT expectedDate
-								FROM purchase
-								WHERE expectedDate = (
-								SELECT MAX(expectedDate) 
-								FROM purchase);");
-	    
-	if($stmt->error) {       
-		printf("<b>Error: %s.</b>\n", $stmt->error);
-		return;
-	}
-	     
-	$stmt->store_result();
-	$count = $stmt->num_rows;
-
-	$stmt->bind_result($expectedDate);
+	if ($stmt = $connection->query("SELECT expectedDate
+									FROM purchase
+									WHERE expectedDate = (
+									SELECT MAX(expectedDate) 
+									FROM purchase);")) {
+		$count = $stmt->num_rows;
 		
-	if($count == 0){
-		print("Sorry bud, no expected dates.\n");
-		exit();
-	} 
-	$stmt->fetch();
+		if($count == 0){
+			print("Sorry bud, no expected dates.\n");
+			exit();
+		} 
+		$row = $stmt->fetch_assoc();
 	
-	$result = array();
-	$result['expectedDate'] = $expectedDate;
-	$result['count'] = $count;
-	//var_dump($item_name);
-	return $result;
+		$result = array();
+		$today = new DateTime();
+		$maxExpected = new DateTime($row['expectedDate']);
+
+		if ($maxExpected < $today) {
+			$result['expectedDate'] = $diff;
+			$result['count'] = 0;	
+		} else {
+			$result['expectedDate'] = $row['expectedDate'];
+			$result['count'] = $count;	
+		}
+		//var_dump($result);
+		
+		return $result;						
+	}
+	    
+	
+	
+	return 0;
 }
 
 /**
