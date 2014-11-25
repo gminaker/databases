@@ -46,7 +46,7 @@ function calculateExpectedDate(){
 	} else {
 		$expectedDate = $result['expectedDate']->add(new DateInterval('P1D'));
 	}
-	var_dump($expectedDate);
+	//var_dump($expectedDate);
 	return $expectedDate;
 }
 
