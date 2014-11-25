@@ -75,10 +75,92 @@
 	}
 	
 	function returnAdvancedSearchResults(){
-		
+		$upc = $_POST['upc'];
+		$title = $_POST['title'];
+		$item_type = $_POST['item_type'];
+		$item_category = $_POST['item_category'];
+		$year = $_POST['year'];
+
+		$like = "";
+
+		if (!empty($upc)){
+			$like .= " AND it_upc like '%$upc%'"; 
+		}
+		if (!empty($title)){
+			$like .= " AND it_title like '%$title%'"; 
+		}
+		if (!empty($item_type)){
+			$like .= " AND type like '%$item_type%'"; 
+		}
+		if (!empty($item_category)){
+			$like .= " AND category like '%$item_category%'";
+		}
+		if (!empty($year)){
+			$like .= " AND year like '%$year%'";
+		}
+		if (!empty($like)){
+			$prefix = ' AND ';
+			$query = substr($like, strlen($prefix));
+
+			global $connection;
+ 	    	$results = $connection->query("	SELECT * 
+											FROM item 
+											WHERE $query;");
+
+ 	    	if(!$results) {       
+
+	 			printf("<b>Error: please attempt again</b>");
+	 			returnSearchPage();
+
+    		} else {
+
+    			print '<table>';
+
+    				print'<tr><th>Results:</th></tr>';
+
+    				print '<tr>';
+			    		print '<th>Quantity</th>';
+		    			print '<th>UPC</th>';
+		    			print '<th>Title</th>';
+		    			print '<th>Type</th>';
+		    			print '<th>Category</th>';
+		    			print '<th>Company</th>';
+		    			print '<th>Year</th>';
+		    			print '<th>Price</th>';
+		    			print '<th>Stock</th>';
+	    			print '</tr>';
+
+
+ 				$i = 0;
+				while($row = $results->fetch_assoc()) {
+	   				print '<tr>';
+				    	print '<td><input type="text" size="5" name="purchase['.$i.'][qty]"></td>';
+		    			print '<input type="hidden" size="5" name="purchase['.$i.'][upc]" value="'.$row["it_upc"].'">';
+		    			print '<td>'.$row["it_upc"].'</td>';
+		    			print '<td>'.$row["it_title"].'</td>';
+		    			print '<td>'.$row["type"].'</td>';
+		    			print '<td>'.$row["category"].'</td>';
+		    			print '<td>'.$row["company"].'</td>';
+		    			print '<td>'.$row["year"].'</td>';
+		    			print '<td>'.$row["price"].'</td>';
+		    			print '<td>'.$row["stock"].'</td>';
+	    			print '</tr>';
+	    
+	    			$i++;
+				}  
+    			print '</table>';
+
+
+				$results->free();
+
+    		}	    
+		} else {
+			print'Error, please input something!';
+			returnSearchPage();
+		}
 	}
 
-function returnSearchPage(){
+	function returnSearchPage(){
 ?>
 	
 	
@@ -94,6 +176,7 @@ function returnSearchPage(){
 	
 <h3>Advanced Search:</h3>
 	<form name="item_search" method="post" action="?page=advanced_search">
+		<input type="hidden" name="search_type" value="advanced">
 		<table>
 			<tr>
 				<th>UPC</th>
