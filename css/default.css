@@ -6,6 +6,14 @@ table th{
 	background-color: grey;
 }
 
+#advanced_search {
+	font-size: 12px;
+	position: relative;
+	top:-25px;
+	color:blue;
+	text-decoration: underline;
+}
+
 h2 {
     font-size: 1.1em;
     padding:0px;
