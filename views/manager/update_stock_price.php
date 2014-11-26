@@ -17,11 +17,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
  		
       if (isset($_POST["submit_new_item"]) && $_POST["submit_new_item"] == "SUBMIT") {
 		checkValsThenInsertIntoDB(	$_POST['item_upc'],
-		      						$_POST['item_title'],
-		      						$_POST['item_type'],
-		      						$_POST['item_category'],
-		      						$_POST['item_company'],
-		      						$_POST['item_year'],
 		      						$_POST['item_price'],
 		      						$_POST['item_stock'] );
       }
@@ -31,21 +26,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
  * sets up calls to check values and insert into DB 
  *
  * @param string $upc
- * @param string $title
- * @param string $type -- one of: cd dvd
- * @param string $category -- one of: rock, pop, rap, country, classical, new age and instrumental.
- * @param string $company
- * @param string $year
  * @param string $prices
  * @param string $stock
  *
  */
- function checkValsThenInsertIntoDB($upc, $title, $type, $category, $company, $year, $price, $stock){
-	 
-	$msg = checkValues($upc, $title, $type, $category, $company, $year, $price, $stock); 
+ function checkValsThenInsertIntoDB($upc, $price, $stock){
+	global $error_stack;
+	$msg = checkValues($upc, $price, $stock); 
+
 	
-	if(!$msg){	
-		insertIntoDB($upc, $title, $type, $category, $company, $year, $price, $stock);
+	if(!$msg){
+		$msg = checkExists($upc);
+		if(!$msg){
+		insertIntoDB($upc, $price, $stock);
+		}
 	}
 }
 
@@ -54,50 +48,63 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
  * or check category values, etc.
  *
  * @param string $upc
- * @param string $title
- * @param string $type -- one of: cd dvd
- * @param string $category -- one of: rock, pop, rap, country, classical, new age and instrumental.
- * @param string $company
- * @param string $year
  * @param string $prices
  * @param string $stock
  *
  */
-function checkValues($upc, $title, $type, $category, $company, $year, $price, $stock){
+function checkValues($upc, $price, $stock){
 	
 	global $error_stack;
 	$errors = null;
 	
-	if (!is_numeric($upc) or (strlen($upc) != 12)){
+	if (empty($upc)){
+		array_push($error_stack, "Please fill in UPC");
+		$errors = true;
+	} else if (!is_numeric($upc) or (strlen($upc) != 12)){
 		array_push($error_stack, "Please recheck UPC");
-		$errors = true;
+		$errors = true;	
 	}
 	
-	if (strlen($title) > 40){
-		array_push($error_stack,"Title too long");
-		$errors = true;
-	}
-	
-	if (strlen($company) > 40){
-		array_push($error_stack, "Company name too long");
-		$errors = true;
-	} 
-	
-	if (!is_numeric($year) or (strlen($year) != 4)){
-		array_push($error_stack, "Please recheck year");
-		$errors = true;
-	} 
-	
-	if (!is_numeric($stock) or (intval($stock) < 0)){
+	if (!empty($stock) and (!is_numeric($stock) or (intval($stock) < 0))){
 		array_push($error_stack, "Please recheck stock");
 		$errors = true;
 	}
-	
-	if (empty($upc) or empty($title) or empty($type) or empty($category) or empty($company) or empty($year) or empty($price) or empty($stock)){
-		array_push($error_stack, "Please fill in all fields");
+
+	if (!empty($price) and (!is_numeric($price) or (floatval($price) < 0.0))){
+		array_push($error_stack, "Please recheck price");
+		$errors = true;
+	}
+
+	if (empty($price) and empty($stock)){
+		array_push($error_stack, "Please fill in one of: stock, price");
 		$errors = true;
 	} 
 	
+	return $errors;
+}
+
+/**
+* Check if UPC exists in DB
+*
+*@param string $upc
+*
+*/
+
+function checkExists($upc){
+	global $error_stack;
+	global $connection;
+
+	$errors = null;
+
+	$results = $connection->query("SELECT * FROM item WHERE it_upc = '$upc';");
+
+	if(!$results){
+		array_push($error_stack, $connection->error);
+	}else if($results->num_rows == 0){
+		array_push($error_stack, 'Not a valid upc.');
+		$errors = true;
+		$results->free();
+	}
 	return $errors;
 }
 
@@ -107,35 +114,39 @@ function checkValues($upc, $title, $type, $category, $company, $year, $price, $s
  * table of our current DB connection. 
  *
  * @param string $upc
- * @param string $title
- * @param string $type -- one of: cd dvd
- * @param string $category -- one of: rock, pop, rap, country, classical, new age and instrumental.
- * @param string $company
- * @param string $year
  * @param string $prices
  * @param string $stock
  *
  */
-function insertIntoDB($upc, $title, $type, $category, $company, $year, $price, $stock){
+function insertIntoDB($upc, $price, $stock){
 	//Since $connection was declared in another page 
 	// within the site, we call global on it
 	global $connection;
 	global $error_stack;
+	global $notice_stack;
 	
- 	$stmt = $connection->prepare("INSERT INTO item (it_upc, it_title, type, category, company, year, price, stock) 
- 	VALUES (?,?,?,?,?,?,?,?)");
-          
-    // Bind the title and pub_id parameters, 'sss' indicates 3 strings
-    $stmt->bind_param("ssssssss",$upc, $title, $type, $category, $company, $year, $price, $stock);
-    
-    // Execute the insert statement
-    $stmt->execute();
-    
+ 	if (empty($price)){
+ 		$query = '	UPDATE item
+					SET stock = stock + '.$stock.'
+					WHERE it_upc = '.$upc.';';
+ 	} else if (empty($stock)){
+ 		$query = '	UPDATE item
+					SET price = '.$price.'
+					WHERE it_upc = '.$upc.';';
+
+ 	} else{
+ 		$query = '	UPDATE item
+					SET stock = stock +'.$stock.', price = '.$price.'
+					WHERE it_upc = '.$upc.';';
+ 	}
+
+ 	$results = $connection->query($query);
+
     // Print any errors if they occured
-    if($stmt->error) {       
-      array_push($error_stack, "<b>Error: %s.</b>\n", $stmt->error);
+    if($connection->error) {       
+      array_push($error_stack, "<b>Error: %s.</b>\n", $results->error);
     } else {
-      array_push($notice_stack, "<b>Successfully added ".$title."</b>");
+      array_push($notice_stack, "<b>Successfully updated ".$upc."</b>");
       unset($_POST);
     }      
     
@@ -151,7 +162,7 @@ function insertIntoDB($upc, $title, $type, $category, $company, $year, $price, $
  
  ?>
 
- <h1>Add Items Page</h1>
+ <h1>Update Items Page</h1>
  <form method="post" name="add_item">
  <input type="hidden" name="submit_new_item" value="SUBMIT">
  
@@ -161,44 +172,8 @@ function insertIntoDB($upc, $title, $type, $category, $company, $year, $price, $
 		 <td><input type="text" name="item_upc" value="<?php postValue('item_upc'); ?>"></td>
 	 </tr>
 	 <tr>
-		 <td>Type</td>
-		 <td><select name="item_type">
-			 	<option value="">Select...</option>
-			 	<option value="cd">CD</option>
-			 	<option value="dvd">DVD</option>
-			 </select>
-		 </td>
-	 </tr>
-	 <tr>
-		 <td>Title</td>
-		 <td><input type="text" name="item_title" value="<?php postValue('item_title'); ?>"></td>
-	 </tr>
-	 <tr>
-		 <td>Category</td>
-		 <td>
-			 <select name="item_category">
-				 <option value="">Select...</option>
-				 <option value="rock">Rock</option>
-				 <option value="pop">Pop</option>
-				 <option value="rap">Rap</option>
-				 <option value="country">Country</option>
-				 <option value="classical">Classical</option>
-				 <option value="new age">New Age</option>
-				 <option value="instrumental">Instrumental</option>
-			 </select>
-		 </td>
-	 </tr>
-	 <tr>
-		 <td>Company</td>
-		 <td><input type="text" name="item_company" value="<?php postValue('item_company'); ?>"></td>
-	 </tr>
-	 <tr>
-		 <td>Year</td>
-		 <td><input type="text" name="item_year" value="<?php postValue('item_year'); ?>"></td>
-	 </tr>
-	 <tr>
 		 <td>Price</td>
-		 <td><input type="number" name="item_price" value="<?php postValue('item_price'); ?>"></td>
+		 <td><input type="number" step ='any' name="item_price" value="<?php postValue('item_price'); ?>"></td>
 	 </tr>
 	 <tr>
 		 <td>Stock</td>
