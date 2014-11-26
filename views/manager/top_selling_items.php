@@ -14,6 +14,8 @@
  */
 function topSellingItems($date,$count){
 
+	global $error_stack;
+	global $notice_stack;
 
 	$cleanDate = date('Y-m-d', strtotime($date));
 
@@ -27,11 +29,11 @@ function topSellingItems($date,$count){
 									ORDER BY sum(pi.pi_quantity) DESC;");
 									
 	if(!$results){
-		printf("Error: %s\n", $connection->error);
+		array_push($error_stack, "Error: %s\n", $connection->error);
 	}						
 	
  	if($results->num_rows == 0){
-	 	print('<table><tr><td colspan=5>No Items Found</td></tr></table>');
+	 	array_push($notice_stack, 'No Items Found');
  	} else {
 		print('<table><tr><th>Top selling items on '.$cleanDate.'</th></tr></table>');
 
@@ -64,37 +66,59 @@ function topSellingItems($date,$count){
 	$results->free();
  }
  
+ function renderTopSellingItemsPage(){
+	 
+	 renderFormInput();
+	 checkInputRenderResults();
+	 
+ }
+ 
+ function renderFormInput(){
+	 ?>
+	  <form method=post>
+	 <h1>Top selling items</h1>
+	 <table>
+		 <tr>
+			 <td>Enter Date:</td>
+			 <td><input type=date name="report_date" class="dynamic_datepicker"></td>
+		 </tr>
+		 <tr>
+			 <td>Enter Total items:</td>
+			 <td><input type="text" name="count"></td>
+		 </tr>
+		 <tr><td></td>
+			 <td><input type=submit value="Get top selling items"></td>
+		 </tr>
+	 </table>
+	 </form>
+ <?php
+ }
+ 
+ function checkInputRenderResults(){
+	 global $error_stack;
+	 
+	 $displayOutput = false;
+	 
+	 if(isset($_POST['report_date'], $_POST['count'])){
+		 $displayOutput = true;
+		 
+		 if(empty($_POST['report_date'])){
+			 array_push($error_stack, 'Please Enter a Valid Date');
+			 $displayOutput = false;
+		 }
+		 
+		 if((!intval($_POST['count']) > 0) || empty($_POST['count'])){
+			 array_push($error_stack, 'Please Enter a valid number');
+			 $displayOutput = false;
+		 } 
+	 }
+	 	
+	if($displayOutput){
+		topSellingItems($_POST['report_date'], intval($_POST['count']));
+	 } 
+ }
+ 
+ renderTopSellingItemsPage();
+ 
 ?>
  
- <form method=post>
- <h1>Top selling items</h1>
- <table>
-	 <tr>
-		 <td>Enter Date:</td>
-		 <td><input type=date name="report_date" class="dynamic_datepicker"></td>
-	 </tr>
-	 <tr>
-		 <td>Enter Total items:</td>
-		 <td><input type="text" name="count"></td>
-	 </tr>
-	 <tr><td></td>
-		 <td><input type=submit value="Get top selling items"></td>
-	 </tr>
- </table>
- </form>
- 
- <?php 
-	 
- if(isset($_POST['report_date'], $_POST['count'])
- 	and (!empty($_POST['report_date']))
- 	and (intval($_POST['count']) > 0)
- 	and (!empty($_POST['count']))){
-	
-	topSellingItems($_POST['report_date'], intval($_POST['count']));
-
- } else if(isset($_POST['report_date'], $_POST['count'])){
-
- 	print('<tr><td colspan=5>Invalid entry, please try again.</td></tr>');
- }
-
- ?>

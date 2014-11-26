@@ -90,6 +90,8 @@ function getAllOrdersToProcess(){
  
  function renderProcessDeliveries(){
 	 
+	 print '<h1>Process Deliveries</h1>';
+	 
 	 $output = getAllOrdersToProcess();
 	 
 	 if($output){
@@ -106,9 +108,7 @@ function getAllOrdersToProcess(){
  }
  
  function renderProcessDeliveryPrefix(){
-	 print '<h1>Process Deliveries</h1>
- 
-			  <table border="1">
+	 print '<table border="1">
 				 <tr>
 					 <th>Receipt ID</th>
 					 <th>Date</th>
