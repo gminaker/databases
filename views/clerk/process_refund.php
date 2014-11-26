@@ -26,15 +26,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 	
 function returned(){
-	$receiptId = $_POST['receipt_id'];
-		
 	global $connection;
+	global $error_stack;
+	
+	$receiptId = $_POST['receipt_id'];	
+	
 	$stmt = $connection->prepare("SELECT ri_upc, ri_quantity, ret_receiptId FROM returnrecord, returnitem WHERE ret_receiptId =  ? AND retId = ri_retId");
 	$stmt->bind_param("s",  $receiptId);
 	$stmt->execute();
 	    
 	if($stmt->error) {       
-		printf("<b>Error: %s.</b>\n", $stmt->error);
+		array_push($error_stack, $stmt->error);
 	}
 	     
 	$stmt->store_result();
@@ -79,9 +81,9 @@ function refundItems($total_quantities){
 	$receiptId = $_POST['receipt_id'];
 		
 	global $connection;
+	global $error_stack;
 		
 	if(isset($_POST['return'])){
-		$error_stack = array();
 		$firstReturn = true;
 		$all_ok = true;
 		$connection->autocommit(FALSE);
@@ -96,7 +98,7 @@ function refundItems($total_quantities){
 			$purchase_qty = $value['pqty'];
 			$qty = $value['qty'];
 			if (array_key_exists($upc, $total_quantities)) {
-				printf("<br>%d of UPC, %s, have/has already been returned on this receipt.</br>", $total_quantities[$upc], $upc);
+				array_push($error_stack, printf("%d of UPC, %s, have/has already been returned on this receipt.</br>", $total_quantities[$upc], $upc));
 				$not_returned_qty = $purchase_qty - $total_quantities[$upc];
 			} else {
 				$not_returned_qty = $purchase_qty;
@@ -151,15 +153,13 @@ function refundItems($total_quantities){
 				printf("<br>Return processed successfully for: %d of UPC: %s on Credit Card No. %s</br>", $value['qty'], $value['upc'], $value['cardNo']);
 			}
 		};			
-		$connection->autocommit(TRUE);
-		if(count($error_stack) > 0){
-			print("Errors occurred:");
-			print_r($error_stack);
-		}	
+		$connection->autocommit(TRUE);	
 	}			
 }
 	
 function checkReceiptDisplayContents(){
+	global $error_stack;
+	global $notice_stack;
 	
 	$oldReceipt = false;
 	$receiptId = $_POST["invoice_no"];
@@ -171,7 +171,7 @@ function checkReceiptDisplayContents(){
 		
 	if($diff->days > 15) {
 		$oldReceipt = true;
-		print 'Warning: This receipt was issued more than 15 days ago';
+		array_push($notice_stack, 'This receipt was issued more than 15 days ago and cannot be returned';
 	}
 	    
 	print '<table>';
@@ -210,12 +210,14 @@ function checkReceiptDisplayContents(){
      
 function getAllReceiptItems($receiptId, $oldReceipt, $cardNo){
 	global $connection;
+	global $error_stack;
+	
 	$stmt = $connection->prepare("SELECT * FROM purchaseitem WHERE pi_receiptId =  ?");
 	$stmt->bind_param("s",  $receiptId);
 	$stmt->execute();
 	    
 	if($stmt->error) {       
-		printf("<b>Error: %s.</b>\n", $stmt->error);
+		array_push($error_stack, $stmt->error);
 	} 
 	    
 	$stmt->store_result();
@@ -223,7 +225,7 @@ function getAllReceiptItems($receiptId, $oldReceipt, $cardNo){
 	$stmt->bind_result($receiptId, $upc, $quantity);
 		
 	if($count == 0){
-		print("This receipt don't have no items.");
+		array_push($error_stack,"This receipt don't have no items.");
 		exit();
 	}
 	$i=0;
@@ -244,12 +246,14 @@ function getAllReceiptItems($receiptId, $oldReceipt, $cardNo){
 	
 function getItemInfo($upc){
 	global $connection;
+	global $error_stack;
+	
 	$stmt = $connection->prepare("SELECT * FROM item WHERE it_upc =  ?");
 	$stmt->bind_param("s", $upc);
 	$stmt->execute();
 	    
 	if($stmt->error) {       
-		printf("<b>Error: %s.</b>\n", $stmt->error);
+		array_push($error_stack, $stmt->error);
 	}
 	     
 	$stmt->store_result();
@@ -259,7 +263,7 @@ function getItemInfo($upc){
 	$year, $price, $stock);
 		
 	if($count == 0){
-		print("Sorry bud, can't find that item.\n");
+		array_push($error_stack,"Sorry bud, can't find that item.");
 		exit();
 	} 
 	$stmt->fetch();
@@ -285,7 +289,7 @@ function getPurchaseInfo($receiptId){
 	$stmt->execute();
 	    
 	if($stmt->error) {       
-		printf("<b>Error: %s.</b><br />", $stmt->error);
+		array_push($error_stack, $stmt->error);
 	}
 	     
 	$stmt->store_result();
@@ -294,7 +298,7 @@ function getPurchaseInfo($receiptId){
 	$stmt->bind_result($receiptId, $date, $cid, $cardNo, $expiryDate, $expectedDate, $deliveredDate);
 		
 	if($count == 0){
-		print("Sorry bud, can't find that receipt.\n");
+		array_push($error_stack,"Sorry bud, can't find that receipt.");
 		exit();
 	} else {
 		$stmt->fetch();
