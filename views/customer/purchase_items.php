@@ -7,7 +7,7 @@
  *
  * PHP version 5
  *
- * @author     Gordon
+ * @author     Gordon, Mike
  * @since     1.0
  *
  */
@@ -33,8 +33,7 @@
 	}
 }
 
-function calculateExpectedDate(){
-	// TODO make a funcion that returns the expected delivery date for the order. 
+function calculateExpectedDate(){ 
 	$deliveries_per_day = 5;
 	$result = getMaxExpectedDate();
 	
