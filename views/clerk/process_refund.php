@@ -171,7 +171,7 @@ function checkReceiptDisplayContents(){
 		
 	if($diff->days > 15) {
 		$oldReceipt = true;
-		array_push($notice_stack, 'This receipt was issued more than 15 days ago and cannot be returned';
+		array_push($notice_stack, 'This receipt was issued more than 15 days ago and cannot be returned');
 	}
 	    
 	print '<table>';
@@ -284,6 +284,8 @@ function renderReceiptCollector(){
 function getPurchaseInfo($receiptId){
 	
 	global $connection;
+	global $error_stack;
+	
 	$stmt = $connection->prepare("SELECT * FROM purchase WHERE p_receiptId =  ?");
 	$stmt->bind_param("s",  $receiptId);
 	$stmt->execute();
