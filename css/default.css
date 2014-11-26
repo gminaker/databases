@@ -80,7 +80,7 @@ h2 {
 }
 
 #content table{
-	width:100%;
+	max-width:920px;
 }
 
 #footer {

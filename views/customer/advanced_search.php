@@ -33,51 +33,22 @@
 
     	} else {
 
-    		print '<table>';
-
-    			print'<tr><th>Results:</th></tr>';
-
-    			print '<tr>';
-			    	print '<th>UPC</th>';
-		    		print '<th>Title</th>';
-		    		print '<th>Type</th>';
-		    		print '<th>Category</th>';
-		    		print '<th>Company</th>';
-		    		print '<th>Year</th>';
-		    		print '<th>Price</th>';
-		    		print '<th>Stock</th>';
-		    		print '<th>Lead Singer</th>';
-		    		print '<th>Qty</th>';
-		    		print '<th>Add to cart</th>';
-	    		print '</tr>';
-
+    		renderTablePrefix();
 
 			while($row = $results->fetch_assoc()) {
-	   			print '<tr>';print '<td>'.$row["it_upc"].'</td>';
-		    		print '<td>'.$row["it_title"].'</td>';
-		    		print '<td>'.$row["type"].'</td>';
-		    		print '<td>'.$row["category"].'</td>';
-		    		print '<td>'.$row["company"].'</td>';
-		    		print '<td>'.$row["year"].'</td>';
-		    		print '<td>'.$row["price"].'</td>';
-		    		print '<td>'.$row["stock"].'</td>';
-		    		print '<td>'.$row["ls_name"].'</td>';
-		    		print '<form name="add_to_cart" method="post" action="?page=view_cart">';
-		    		print '<input type="hidden" name="add_to_cart" value="true">';
-		    		print '<input type="hidden" size="5" name="cart_upc" value="'.$row["it_upc"].'">';
-		    		print '<td><input type="text" size="5" name="cart_qty"></td>';
-		    		print '<td><input type="submit" value="Add to Cart"></td>';
-		    		print '</form>';
-	    		print '</tr>';
-
+	   			renderRow($row);
 			}  
-    		print '</table>';
-
+			
+    		renderTablePostfix();
 
 			$results->free();
 
     	}	    
     	
+	}
+	
+	function renderTablePostfix(){
+		  print '</table>';
 	}
 	
 	function returnAdvancedSearchResults(){
@@ -126,57 +97,62 @@
 
     		} else {
 
-    			print '<table>';
+				renderTablePrefix();
 
-    				print'<tr><th>Results:</th></tr>';
-
-    				print '<tr>';
-		    			print '<th>UPC</th>';
-		    			print '<th>Title</th>';
-		    			print '<th>Type</th>';
-		    			print '<th>Category</th>';
-		    			print '<th>Company</th>';
-		    			print '<th>Year</th>';
-		    			print '<th>Price</th>';
-		    			print '<th>Stock</th>';
-		    			print '<th>Lead Singer</th>';
-		    			print '<th>Add to cart</th>';
-	    			print '</tr>';
-
-
- 				$i = 0;
 				while($row = $results->fetch_assoc()) {
-	   				print '<tr>';
-		    			print '<td>'.$row["it_upc"].'</td>';
-		    			print '<td>'.$row["it_title"].'</td>';
-		    			print '<td>'.$row["type"].'</td>';
-		    			print '<td>'.$row["category"].'</td>';
-		    			print '<td>'.$row["company"].'</td>';
-		    			print '<td>'.$row["year"].'</td>';
-		    			print '<td>'.$row["price"].'</td>';
-		    			print '<td>'.$row["stock"].'</td>';
-		    			print '<td>'.$row["ls_name"].'</td>';
-		    			print '<form name="add_to_cart" method="post" action="?page=view_cart">';
-		    			print '<input type="hidden" name="add_to_cart" value="true">';
-		    			print '<input type="hidden" size="5" name="cart_upc" value="'.$row["it_upc"].'">';
-		    			print '<td><input type="text" size="5" name="cart_qty"></td>';
-		    			print '<td><input type="submit" value="Add to Cart"></td>';
-		    			print '</form>';
-	    			print '</tr>';
-	    
-	    			$i++;
+	   				renderRow($row);
 				}  
-    			print '</table>';
-
+    			
+    			renderTablePostfix();
 
 				$results->free();
 
     		}	    
 		} else {
 			array_push($error_stack, "Please enter search terms.");
+
 			returnSearchPage();
 		}
 	}
+	
+function renderTablePrefix(){
+	print '<h2>Search Results</h2>';
+	print '<table>';
+		print '<tr>';
+			print '<th>UPC</th>';
+			print '<th>Title</th>';
+			print '<th>Type</th>';
+			print '<th>Category</th>';
+			print '<th>Company</th>';
+			print '<th>Year</th>';
+			print '<th>Price</th>';
+			print '<th>Stock</th>';
+			print '<th>QTY</th>';
+			print '<th>Lead Singer</th>';
+			print '<th>Add to cart</th>';
+		print '</tr>';
+}	
+
+function renderRow($row){
+	print '<tr>';
+		print '<td>'.$row["it_upc"].'</td>';
+		print '<td>'.$row["it_title"].'</td>';
+		print '<td>'.$row["type"].'</td>';
+		print '<td>'.$row["category"].'</td>';
+		print '<td>'.$row["company"].'</td>';
+		print '<td>'.$row["year"].'</td>';
+		print '<td>'.$row["price"].'</td>';
+		print '<td>'.$row["stock"].'</td>';
+		print '<td>'.$row["ls_name"].'</td>';
+		print '<form name="add_to_cart" method="post" action="?page=view_cart">';
+		print '<input type="hidden" name="add_to_cart" value="true">';
+		print '<input type="hidden" size="5" name="cart_upc" value="'.$row["it_upc"].'">';
+		print '<td><input type="text" size="5" name="cart_qty"></td>';
+		print '<td><input type="submit" value="Add to Cart"></td>';
+		print '</form>';
+	print '</tr>';
+	    
+}
 
 function returnSearchPage(){
 	?>
