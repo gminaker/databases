@@ -18,7 +18,7 @@
 		checkValsThenInsertIntoDB($_SESSION['user_id'], 
 								  $_POST['user_ccno'],
 		      					  $_POST['user_ccex'],
-		      					  $_POST['cart']);
+		      					  $_SESSION['cart']);
       }
  }
  
@@ -140,7 +140,7 @@ function insertIntoDB($user_id, $cc_no, $cc_ex, $expected_date, $all){
     
     // Print any errors if they occured
     if($stmt->error) {       
-      array_push($error_stack, $stmt->error);
+      array_push($error_stack, $stmt->error. ' at line number '.__LINE__);
     }     
     
     $receiptId = $stmt->insert_id;
@@ -149,7 +149,7 @@ function insertIntoDB($user_id, $cc_no, $cc_ex, $expected_date, $all){
 	    foreach($all as $key => $value) {
 		    
 			    $upc = $key;
-			    $qty = $qty;
+			    $qty = $value;
 			    
 				if ($qty > 0){
 				  	
@@ -160,7 +160,7 @@ function insertIntoDB($user_id, $cc_no, $cc_ex, $expected_date, $all){
 				$stmt->execute();
 				  // Print any errors if they occured
 				if($stmt->error) {       
-				  array_push($error_stack, $stmt->error);
+				  array_push($error_stack, $stmt->error.__LINE__);
 				}    
 			}
 		}

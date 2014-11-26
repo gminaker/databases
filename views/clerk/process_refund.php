@@ -171,6 +171,10 @@ function checkReceiptDisplayContents(){
 	$oldReceipt = false;
 	$receiptId = $_POST["invoice_no"];
 	$purchase = getPurchaseInfo($receiptId);
+	
+	if ($purchase = "No receipt") {
+		return;
+	}
 		
 	$r_date = new DateTime($purchase['date']);
 	$now = new DateTime();
@@ -233,7 +237,6 @@ function getAllReceiptItems($receiptId, $oldReceipt, $cardNo){
 		
 	if($count == 0){
 		array_push($error_stack,"This receipt don't have no items.");
-		exit();
 	}
 	$i=0;
 	while($stmt->fetch()){
@@ -271,7 +274,6 @@ function getItemInfo($upc){
 		
 	if($count == 0){
 		array_push($error_stack,"Sorry bud, can't find that item.");
-		exit();
 	} 
 	$stmt->fetch();
 
@@ -307,19 +309,20 @@ function getPurchaseInfo($receiptId){
 	$stmt->bind_result($receiptId, $date, $cid, $cardNo, $expiryDate, $expectedDate, $deliveredDate);
 		
 	if($count == 0){
-		array_push($error_stack,"Sorry bud, can't find that receipt.");
-		exit();
+		array_push($error_stack,"Sorry bud, can't find receipt #$receiptId.");
+		$a = "No receipt";
 	} else {
 		$stmt->fetch();
+		$a = array();
+		$a['receiptId'] = $receiptId;
+		$a['date'] = $date;
+		$a['cid'] = $cid;
+		$a['cardNo']  = $cardNo;
+		$a['expiryDate'] = $expiryDate;
+		$a['expectedDate'] = $expectedDate;
+		$a['deliveredDate'] = $deliveredDate;
 	}
-	$a = array();
-	$a['receiptId'] = $receiptId;
-	$a['date'] = $date;
-	$a['cid'] = $cid;
-	$a['cardNo']  = $cardNo;
-	$a['expiryDate'] = $expiryDate;
-	$a['expectedDate'] = $expectedDate;
-	$a['deliveredDate'] = $deliveredDate;
+	
 	  
 	return $a;
 }
