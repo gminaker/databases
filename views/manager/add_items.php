@@ -83,7 +83,7 @@ function checkValues($upc, $title, $type, $category, $company, $year, $price, $s
 		$errors = true;
 	} 
 	
-	if (!is_numeric($year) or (strlen($year) != 4)){
+	if (!is_numeric($year) or (strlen($year) != 4) or (2155 < intval($year)) or (intval($year) < 1901)){
 		array_push($error_stack, "Please recheck year");
 		$errors = true;
 	} 
@@ -121,12 +121,13 @@ function insertIntoDB($upc, $title, $type, $category, $company, $year, $price, $
 	// within the site, we call global on it
 	global $connection;
 	global $error_stack;
+	global $notice_stack;
 	
  	$stmt = $connection->prepare("INSERT INTO item (it_upc, it_title, type, category, company, year, price, stock) 
  	VALUES (?,?,?,?,?,?,?,?)");
           
     // Bind the title and pub_id parameters, 'sss' indicates 3 strings
-    $stmt->bind_param("ssssssss",$upc, $title, $type, $category, $company, $year, $price, $stock);
+    $stmt->bind_param("ssssssss",$upc, $title, $type, $category, $company, intval($year), $price, $stock);
     
     // Execute the insert statement
     $stmt->execute();
