@@ -98,7 +98,8 @@ function refundItems($total_quantities){
 			$purchase_qty = $value['pqty'];
 			$qty = $value['qty'];
 			if (array_key_exists($upc, $total_quantities)) {
-				array_push($error_stack, printf("%d of UPC, %s, have/has already been returned on this receipt.</br>", $total_quantities[$upc], $upc));
+				//array_push($error_stack, "$total_quantities[$upc] of UPC, $upc, have/has already been returned on this receipt.");
+				printf("<br>%d of UPC, %s, have/has already been returned on this receipt.</br>", $total_quantities[$upc], $upc);
 				$not_returned_qty = $purchase_qty - $total_quantities[$upc];
 			} else {
 				$not_returned_qty = $purchase_qty;
@@ -116,7 +117,7 @@ function refundItems($total_quantities){
 					$stmt->execute();
 
 					// Print any errors if they occured
-					if($stmt->error) {       
+					if($stmt->error) {      
 						array_push($error_stack, $stmt->error);
 					}     
 	    
@@ -133,10 +134,11 @@ function refundItems($total_quantities){
 	
 				if($stmt->error) {       
 					array_push($error_stack, $stmt->error);
+
 					$connection->rollback();
 					$connection->autocommit(TRUE);
 					break;
-				} else if (count($error_stack) == 0){
+				} else {
 					// Transaction would work add it to the array.
 					$transactions[$n] = $value;	
 					$n++;				
@@ -145,7 +147,7 @@ function refundItems($total_quantities){
 			} else if ($qty == ""){
 				// No return attempted.
 			} else {
-				printf("<br>Sorry, can't return %d of UPC: %s.</br>", $qty, $upc);
+				array_push($error_stack, "Sorry, can't return $qty of UPC: $upc.");
 			}
 		}
 		if($connection->commit()) {
