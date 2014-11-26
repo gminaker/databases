@@ -22,7 +22,7 @@ h2 {
 
 #errors {
 	background-color: lightcoral;
-	width:100%;
+	width:900px;
 	padding:5px;
 	border: 1px solid;
     border-radius: 10px;
@@ -30,7 +30,7 @@ h2 {
 
 #notices {
 	background-color: lightyellow;
-	width:100%;
+	width:900px;
 	padding:5px;
 	border: 1px solid;
     border-radius: 10px;

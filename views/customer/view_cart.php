@@ -205,6 +205,7 @@ function renderCCInfo(){
 
  	foreach($cart as $key => $value){
 		$result = $connection->query("SELECT * FROM item WHERE it_upc = $key");
+		
 		if(!$result){
 			array_push($error_stack,  $connection->error);
 		}else if(!($result->num_rows == 0)){
@@ -213,7 +214,6 @@ function renderCCInfo(){
  		}
 
 		$result->free();
-
  		}
  	}
 
