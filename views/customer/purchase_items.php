@@ -12,27 +12,24 @@
  *
  */
  
-  if ($_SERVER["REQUEST_METHOD"] == "POST") {
+ if($_SERVER["REQUEST_METHOD"] == "POST") {
  		
       if (isset($_POST["purchase_items"]) && $_POST["purchase_items"] == "SUBMIT") {
-		checkValsThenInsertIntoDB(	$_POST['user_id'],
-		      						$_POST['user_pass'],
-		      						$_POST['user_ccno'],
-		      						$_POST['user_ccex'],
-		      						$_POST);
+		checkValsThenInsertIntoDB($_SESSION['user_id'], 
+								  $_POST['user_ccno'],
+		      					  $_POST['user_ccex'],
+		      					  $_POST['cart']);
       }
  }
  
  
- function checkValsThenInsertIntoDB($user_id, $user_pass, $cc_no, $cc_ex, $all){
+ function checkValsThenInsertIntoDB($user_id, $cc_no, $cc_ex, $all){
 	 
-	$msg = checkValues($user_id, $user_pass, $cc_no, $cc_ex, $all); 
+	$error = checkValues($cc_no, $cc_ex, $all); 
 	$expected_date = calculateExpectedDate();
 	
-	if($msg){
-		printf("%s", $msg);
-	}else{
-		insertIntoDB($user_id, $user_pass, $cc_no, $cc_ex, $expected_date, $all);
+	if(!$error){
+		insertIntoDB($user_id, $cc_no, $cc_ex, $expected_date, $all);
 	}
 }
 
@@ -51,6 +48,8 @@ function calculateExpectedDate(){
 }
 
 function getMaxExpectedDate(){
+	global $error_stack;
+	
 	global $connection;
 	if ($stmt = $connection->query("SELECT expectedDate
 									FROM purchase
@@ -60,7 +59,7 @@ function getMaxExpectedDate(){
 		$count = $stmt->num_rows;
 		
 		if($count == 0){
-			print("Sorry bud, no expected dates.\n");
+			array_push($error_stack, "Sorry bud, no expected dates");
 			exit();
 		} 
 		$row = $stmt->fetch_assoc();
@@ -80,8 +79,6 @@ function getMaxExpectedDate(){
 		
 		return $result;						
 	}
-	    
-	
 	
 	return 0;
 }
@@ -97,10 +94,27 @@ function getMaxExpectedDate(){
  * @param string $all
  *
  */
-function checkValues($user_id, $user_pass, $cc_no, $cc_ex, $all){
+function checkValues($cc_no, $cc_ex, $all){
+	global $error_stack;
 	
-	//TODO check user id & password.
-	return null;
+	$errors = false;
+	
+	if(empty($cc_no)){
+		array_push($error_stack, 'Please go back enter a credit card number.');
+		$errors = true;
+	}
+	
+	if(empty($cc_ex)){
+		array_push($error_stack, 'Please go back enter a credit card expiry date.');
+		$errors = true;
+	}
+	
+	if(!is_numeric($cc_no) || strlen($cc_no) != 16){
+		array_push($error_stack, 'Please enter a valid credit card number');
+		$errors = true;
+	}
+	
+	return $errors;
 }
 
 
@@ -115,9 +129,11 @@ function checkValues($user_id, $user_pass, $cc_no, $cc_ex, $all){
  * @param string $all
  *
  */
-function insertIntoDB($user_id, $user_pass, $cc_no, $cc_ex, $expected_date, $all){
+function insertIntoDB($user_id, $cc_no, $cc_ex, $expected_date, $all){
 
 	global $connection;
+	global $error_stack;
+	
  	$stmt = $connection->prepare("INSERT INTO purchase (p_date, p_cid, cardNo, expiryDate, expectedDate) VALUES (?,?,?,?,?)");
     
     // Bind the title and pub_id parameters, 'sss' indicates 3 strings
@@ -126,8 +142,6 @@ function insertIntoDB($user_id, $user_pass, $cc_no, $cc_ex, $expected_date, $all
     // Execute the insert statement
     $stmt->execute();
     
-    $error_stack = array();
-    
     // Print any errors if they occured
     if($stmt->error) {       
       array_push($error_stack, $stmt->error);
@@ -135,11 +149,11 @@ function insertIntoDB($user_id, $user_pass, $cc_no, $cc_ex, $expected_date, $all
     
     $receiptId = $stmt->insert_id;
     
-    if(isset($_POST['purchase'])){
-	    foreach($_POST['purchase'] as $key => $value) {
+    if(isset($all)){
+	    foreach($all as $key => $value) {
 		    
-			    $upc = $value['upc'];
-			    $qty = $value['qty'];
+			    $upc = $key;
+			    $qty = $qty;
 			    
 				if ($qty > 0){
 				  	
@@ -156,89 +170,11 @@ function insertIntoDB($user_id, $user_pass, $cc_no, $cc_ex, $expected_date, $all
 		}
 	}
 	
-	if(count($error_stack) > 0){
-		print("Errors occurred:");
-		print_r($error_stack);
-	}else{
-		print("Order was submitted successfully!");
-	}
-              
-    
+	if(empty($error_stack) || $receiptId){
+		renderReceipt($receiptId);
+	}         
  }
  
- 
-
- function getAllItemRows(){
-	global $connection;
- 	$results = $connection->query("SELECT * FROM item");
- 	
- 	if($results->num_rows == 0){
-	 	print '<tr><td colspan=9>No Items Found</td</tr>';
- 	}
-
- 	$i = 0;
-	while($row = $results->fetch_assoc()) {
-	    print '<tr>';
-		    print '<td><input type="text" size="5" name="purchase['.$i.'][qty]"></td>';
-		    print '<input type="hidden" size="5" name="purchase['.$i.'][upc]" value="'.$row["it_upc"].'">';
-		    print '<td>'.$row["it_upc"].'</td>';
-		    print '<td>'.$row["it_title"].'</td>';
-		    print '<td>'.$row["type"].'</td>';
-		    print '<td>'.$row["category"].'</td>';
-		    print '<td>'.$row["company"].'</td>';
-		    print '<td>'.$row["year"].'</td>';
-		    print '<td>'.$row["price"].'</td>';
-		    print '<td>'.$row["stock"].'</td>';
-	    print '</tr>';
-	    
-	    $i++;
-	}  
-
-	$results->free();
+ function renderReceipt($receiptID){
+	 print 'Receipt #:'.$receiptID;
  }
- 
- ?>
- 
- <form method=post name="purchase_item_form">
- <input type="hidden" name="purchase_items" value="SUBMIT">
- <table>
-	 <tr> 
-		 <td>User ID:</td>
-		 <td><input type="text" name="user_id"></td>
-	 </tr>
-	 <tr>
-		 <td>User Password</td>
-		 <td><input type="password" name="user_pass"></td>
-	 </tr>
-	 <tr>
-		 <td>Credit Card Number</td>
-		 <td><input type="text" name="user_ccno"></td>
-	 </tr>
-	 <tr>
-		 <td>Credit Card Expiry</td>
-		 <td><input type=date name="user_ccex"></td>
-	 </tr>
- </table>
- 
- <table border="1">
-	 <tr>
-		 <th>QTY</th>
-		 <th>UPC</th>
-		 <th>Title</th>
-		 <th>Type</th>
-		 <th>Category</th>
-		 <th>Company</th>
-		 <th>Year</th>
-		 <th>Price</th>
-		 <th>Stock</th>
-	 </tr>
-	 
-	 <?php getAllItemRows(); ?>
-	 
-	 <tr>
-		 <td colspan=8></td>
-		 <td><input type=submit value="Place Order"></td>
-	 </tr>
- </table>
- </form>
-	 

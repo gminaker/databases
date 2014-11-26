@@ -127,8 +127,8 @@ function renderTablePrefix(){
 			print '<th>Year</th>';
 			print '<th>Price</th>';
 			print '<th>Stock</th>';
-			print '<th>QTY</th>';
 			print '<th>Lead Singer</th>';
+			print '<th>QTY</th>';
 			print '<th>Add to cart</th>';
 		print '</tr>';
 }	
