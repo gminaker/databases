@@ -7,7 +7,7 @@
 *
 * PHP version 5
 *
-* @author     Gordon
+* @author   Gordon
 * @since    1.0
 *
 */
