@@ -125,7 +125,6 @@
     				print'<tr><th>Results:</th></tr>';
 
     				print '<tr>';
-			    		print '<th>Quantity</th>';
 		    			print '<th>UPC</th>';
 		    			print '<th>Title</th>';
 		    			print '<th>Type</th>';
@@ -133,15 +132,15 @@
 		    			print '<th>Company</th>';
 		    			print '<th>Year</th>';
 		    			print '<th>Price</th>';
+		    			print '<th>Stock</th>';
 		    			print '<th>Lead Singer</th>';
+		    			print '<th>Add to cart</th>';
 	    			print '</tr>';
 
 
  				$i = 0;
 				while($row = $results->fetch_assoc()) {
 	   				print '<tr>';
-				    	print '<td><input type="text" size="5" name="purchase['.$i.'][qty]"></td>';
-		    			print '<input type="hidden" size="5" name="purchase['.$i.'][upc]" value="'.$row["it_upc"].'">';
 		    			print '<td>'.$row["it_upc"].'</td>';
 		    			print '<td>'.$row["it_title"].'</td>';
 		    			print '<td>'.$row["type"].'</td>';
@@ -151,6 +150,12 @@
 		    			print '<td>'.$row["price"].'</td>';
 		    			print '<td>'.$row["stock"].'</td>';
 		    			print '<td>'.$row["ls_name"].'</td>';
+		    			print '<form name="add_to_cart" method="post" action="?page=view_cart">';
+		    			print '<input type="hidden" name="add_to_cart" value="true">';
+		    			print '<input type="hidden" size="5" name="cart_upc" value="'.$row["it_upc"].'">';
+		    			print '<td><input type="text" size="5" name="cart_qty"></td>';
+		    			print '<td><input type="submit" value="Add to Cart"></td>';
+		    			print '</form>';
 	    			print '</tr>';
 	    
 	    			$i++;
