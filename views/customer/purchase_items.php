@@ -149,7 +149,7 @@ function insertIntoDB($user_id, $cc_no, $cc_ex, $expected_date, $all){
 	    foreach($all as $key => $value) {
 		    
 			    $upc = $key;
-			    $qty = $qty;
+			    $qty = $value;
 			    
 				if ($qty > 0){
 				  	
