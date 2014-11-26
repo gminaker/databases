@@ -18,7 +18,7 @@
 		checkValsThenInsertIntoDB($_SESSION['user_id'], 
 								  $_POST['user_ccno'],
 		      					  $_POST['user_ccex'],
-		      					  $_POST['cart']);
+		      					  $_SESSION['cart']);
       }
  }
  
