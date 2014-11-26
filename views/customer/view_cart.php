@@ -58,12 +58,10 @@
 				}else{
 					$_SESSION['cart'][$key] = $qty;
 				}
-
 			}
 		}
     }
-    
-
+ 
  
  function generateCartDisplay(){
 	 global $notice_stack;
@@ -79,6 +77,8 @@
 		 foreach($cart as $key => $value){
 			 getItemRow($key, $value);
 		 }
+		 
+		 renderTablePostfix();
 	 
 	 }
  }
