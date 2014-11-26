@@ -43,7 +43,6 @@ function calculateExpectedDate(){
 	} else {
 		$expectedDate = $result['expectedDate']->add(new DateInterval('P1D'));
 	}
-	//var_dump($expectedDate);
 	return $expectedDate;
 }
 
@@ -57,25 +56,22 @@ function getMaxExpectedDate(){
 									SELECT MAX(expectedDate) 
 									FROM purchase);")) {
 		$count = $stmt->num_rows;
-		
+		//var_dump($count);
 		if($count == 0){
 			array_push($error_stack, "Sorry bud, no expected dates");
 			exit();
 		} 
 		$row = $stmt->fetch_assoc();
-	
 		$result = array();
 		$today = new DateTime();
 		$maxExpected = new DateTime($row['expectedDate']);
-
 		if ($maxExpected < $today) {
-			$result['expectedDate'] = $diff;
+			$result['expectedDate'] = $today->format('Y-m-d H:i:s');
 			$result['count'] = 0;	
 		} else {
-			$result['expectedDate'] = $row['expectedDate'];
+			$result['expectedDate'] = $maxExpected->format('Y-m-d H:i:s');
 			$result['count'] = $count;	
 		}
-		//var_dump($result);
 		
 		return $result;						
 	}
