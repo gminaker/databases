@@ -201,7 +201,7 @@ function insertIntoDB($upc, $title, $type, $category, $company, $year, $price, $
 	 </tr>
 	 <tr>
 		 <td>Price</td>
-		 <td><input type="number" step ='any' name="item_price" value="<?php postValue('item_price'); ?>"></td>
+		 <td><input type="number" step = '0.01' name="item_price" value="<?php postValue('item_price'); ?>"></td>
 	 </tr>
 	 <tr>
 		 <td>Stock</td>
