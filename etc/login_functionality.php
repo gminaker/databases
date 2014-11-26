@@ -4,7 +4,27 @@
 session_start();
 
 if(isset($_POST['login_id']) && isset($_POST['login_pass'])){
-	loginUser($_POST['login_id'], $_POST['login_pass']);
+	if(checkVal($_POST['login_id'], $_POST['login_pass'])){
+		loginUser($_POST['login_id'], $_POST['login_pass']);
+	}
+}
+
+function checkVal($id, $pass){
+
+	global $error_stack;
+
+	$return = true;
+
+	if (empty($id)){
+      array_push($error_stack, "Please input username");
+      $return = false;
+	}
+	if (empty($pass)){
+      array_push($error_stack, "Please input password");
+      $return = false;
+	}
+	return $return;
+
 }
 
 function loginUser($id, $pass){
@@ -36,7 +56,7 @@ function loginUser($id, $pass){
 			$_SESSION['user_id'] = $id;
 			array_push($notice_stack,'You are now logged in');
 		}else{
-			array_push($error_stack, 'incorrect password. please try again.');
+			array_push($error_stack, 'Incorrect password. Please try again.');
 		}
 	}	
 }
@@ -44,6 +64,7 @@ function loginUser($id, $pass){
 if(isset($_GET['logout']) && $_GET['logout'] == true){
 	$_SESSION['user_id'] = null;
 	$_SESSION['cart'] = null;
+	array_push($notice_stack,'You are now logged out');
 }
 
 ?>
