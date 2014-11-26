@@ -150,7 +150,7 @@ function refundItems($total_quantities){
 				array_push($notice_stack, "Return processed successfully for: $qty of UPC: $upc on Credit Card No. $cardNo");
 			}
 		};			
-		$connection->autocommit(TRUE);	
+		$connection->autocommit(TRUE);
 	}			
 }
 	
@@ -161,8 +161,7 @@ function checkReceiptDisplayContents(){
 	$oldReceipt = false;
 	$receiptId = $_POST["invoice_no"];
 	$purchase = getPurchaseInfo($receiptId);
-	
-	if ($purchase = "No receipt") {
+	if ($purchase == NULL) {
 		return;
 	}
 		
@@ -266,7 +265,6 @@ function getItemInfo($upc){
 		array_push($error_stack,"Sorry bud, can't find that item.");
 	} 
 	$stmt->fetch();
-
 	return $item_name;
 }
 	
@@ -299,7 +297,8 @@ function getPurchaseInfo($receiptId){
 		
 	if($count == 0){
 		array_push($error_stack,"Sorry bud, can't find receipt #$receiptId.");
-		$a = "No receipt";
+		$a = NULL;
+
 	} else {
 		$stmt->fetch();
 		$a = array();
@@ -310,8 +309,7 @@ function getPurchaseInfo($receiptId){
 		$a['expiryDate'] = $expiryDate;
 		$a['expectedDate'] = $expectedDate;
 		$a['deliveredDate'] = $deliveredDate;
-	}
-		  
+	} 
 	return $a;
 }
  
