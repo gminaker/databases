@@ -82,6 +82,7 @@ function refundItems($total_quantities){
 		
 	global $connection;
 	global $error_stack;
+	global $notice_stack;
 		
 	if(isset($_POST['return'])){
 		$firstReturn = true;
@@ -98,8 +99,8 @@ function refundItems($total_quantities){
 			$purchase_qty = $value['pqty'];
 			$qty = $value['qty'];
 			if (array_key_exists($upc, $total_quantities)) {
-				//array_push($error_stack, "$total_quantities[$upc] of UPC, $upc, have/has already been returned on this receipt.");
-				printf("<br>%d of UPC, %s, have/has already been returned on this receipt.</br>", $total_quantities[$upc], $upc);
+				array_push($notice_stack, "$total_quantities[$upc] of UPC, $upc, have/has already been returned on this receipt.");
+				//printf("<br>%d of UPC, %s, have/has already been returned on this receipt.</br>", $total_quantities[$upc], $upc);
 				$not_returned_qty = $purchase_qty - $total_quantities[$upc];
 			} else {
 				$not_returned_qty = $purchase_qty;
@@ -152,7 +153,11 @@ function refundItems($total_quantities){
 		}
 		if($connection->commit()) {
 			foreach($transactions as $value) {
-				printf("<br>Return processed successfully for: %d of UPC: %s on Credit Card No. %s</br>", $value['qty'], $value['upc'], $value['cardNo']);
+				$qty = $value['qty'];
+				$upt = $value['upc'];
+				$cardNo = $value['cardNo'];
+				array_push($notice_stack, "Return processed successfully for: $qty of UPC: $upc on Credit Card No. $cardNo");
+				//printf("<br>Return processed successfully for: %d of UPC: %s on Credit Card No. %s</br>", $value['qty'], $value['upc'], $value['cardNo']);
 			}
 		};			
 		$connection->autocommit(TRUE);	
