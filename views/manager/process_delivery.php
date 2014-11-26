@@ -57,7 +57,7 @@
    }
  
  
-function getAllOrdersToProcess(){
+function renderProcessDeliveries(){
 	global $connection;
 	global $notice_stack;
 	
@@ -66,6 +66,10 @@ function getAllOrdersToProcess(){
  	if($results->num_rows == 0){
 	 	array_push($notice_stack, 'No orders needing delivery dates were found.');
  	}else{
+
+ 		print '<h1>Process Deliveries</h1>';
+
+ 		renderProcessDeliveryPrefix();
 
 	 	$i = 0;
 		while($row = $results->fetch_assoc()) {
@@ -83,23 +87,12 @@ function getAllOrdersToProcess(){
 		print'<tr><td colspan=4></td>
 		 		  <td><input type=submit value="Update Delivery Dates"></td>
 		      </tr>';
+
+
+	 	renderProcessDeliveryPostfix();
+
 	}
 	$results->free();
- }
- 
- 
- function renderProcessDeliveries(){
-	 
-	 print '<h1>Process Deliveries</h1>';
-	 
-	 $output = getAllOrdersToProcess();
-	 
-	 if($output){
-	 renderProcessDeliveryPrefix();
-	 $output;
-	 renderProcessDeliveryPostfix();
-	 }
-	 
  }
  
  function renderProcessDeliveryPostfix(){
