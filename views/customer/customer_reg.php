@@ -47,11 +47,9 @@
  */
  function checkValsThenInsertIntoDB($name, $addr, $tel, $id, $pass){
 	 
-	$msg = checkValues($name, $addr, $tel, $id, $pass); 
+	$error = checkValues($name, $addr, $tel, $id, $pass); 
 	
-	if($msg){
-		printf("%s", $msg);
-	}else{
+	if(!$error){
 		insertIntoDB($name, $addr, $tel, $id, $pass);
 	}
 }
@@ -68,9 +66,52 @@
  *
  */
 function checkValues($name, $addr, $tel, $id, $pass){
+	global $error_stack;
+	global $connection;
 	
-	//TODO Implement if we want to check minimum length for passwords, etc. 
-	return null;
+	$errors = false;
+	
+	if(empty($name)){
+		array_push($error_stack, 'Please enter your name');
+		$errors = true;
+	}
+	
+	if(empty($addr)){
+		array_push($error_stack, 'Please enter your address');
+		$errors = true;
+	}
+	
+	if(empty($tel)){
+		array_push($error_stack, 'Please enter your phone number');
+		$errors = true;
+	}
+	
+	if(empty($id)){
+		array_push($error_stack, 'Please enter an ID');
+		$errors = true;
+	}else{
+		$results = $connection->query("SELECT * FROM customer WHERE cid = '$id';");
+		
+		if(!$results){
+			array_push($error_stack, $connection->error);
+		}else if($results->num_rows > 0){
+			array_push($error_stack, 'This ID has already been used. Please try another one.');
+			$errors = true;
+			$results->free();
+		} 
+	}
+
+	if(empty($pass)){
+		array_push($error_stack, 'Please enter a password');
+		$errors = true;
+	}
+	
+	if(!empty($pass) && strlen($pass) < 4){
+		array_push($error_stack, 'Please enter a password that is longer than four characters');
+		$errors = true;
+	}
+		
+	return $errors;
 }
 
 
@@ -86,9 +127,11 @@ function checkValues($name, $addr, $tel, $id, $pass){
  *
  */
 function insertIntoDB($name, $addr, $tel, $id, $pass){
-	//Since $connection was declared in another page 
-	// within the site, we call global on it
+
 	global $connection;
+	global $error_stack;
+	global $notice_stack;
+	
  	$stmt = $connection->prepare("INSERT INTO customer (cid, c_password, c_name, address, phone) VALUES (?,?,?,?,?)");
           
     // Bind the title and pub_id parameters, 'sss' indicates 3 strings
@@ -99,12 +142,18 @@ function insertIntoDB($name, $addr, $tel, $id, $pass){
     
     // Print any errors if they occured
     if($stmt->error) {       
-      printf("<b>Error: %s.</b>\n", $stmt->error);
+      array_push($error_stack, $stmt->error);
     } else {
-      echo "<b>Successfully added ".$id."</b>";
+      array_push($notice_stack, "Your user account: ".$id." has been created. Please login.");
       unset($_POST);
     }      
     
+ }
+ 
+ function postValue($key){
+	 if(isset($_POST[$key])){
+		 print $_POST[$key];
+	 }
  }
  
  ?>
@@ -123,19 +172,19 @@ function insertIntoDB($name, $addr, $tel, $id, $pass){
 	 <table>
 		 <tr>
 		 	<td>Name:</td>
-		 	<td><input type="text" name="user_name" value="<?php if(isset($_POST['user_name'])) $_POST['user_name'] ?>" maxlength="20"></td>
+		 	<td><input type="text" name="user_name" value="<?php postValue('user_name'); ?>" maxlength="20"></td>
 		 </tr>
 	 	 <tr>
 		 	<td>Address:</td>
-		 	<td><input type="text" name="user_address" value="<?php if(isset($_POST['user_address'])) $_POST['user_address'] ?>" maxlength="40"></td>
+		 	<td><input type="text" name="user_address" value="<?php postValue('user_address'); ?>" maxlength="40"></td>
 		 </tr>
 	  	 <tr>
 		 	<td>Phone:</td>
-		 	<td><input type="tel" name="user_phone" value="<?php if(isset($_POST['user_phone'])) $_POST['user_phone'] ?>"></td>
+		 	<td><input type="tel" name="user_phone" value="<?php postValue('user_phone'); ?>"></td>
 		 </tr>
 		 <tr>
 		 	<td>User ID:</td>
-		 	<td><input type="text" name="user_id" maxlength="20" value="<?php if(isset($_POST['user_id'])) $_POST['user_id']; ?>"></td>
+		 	<td><input type="text" name="user_id" maxlength="20" value="<?php postValue('user_id'); ?>"></td>
 		 </tr>
 		 <tr>
 		 	<td>Password:</td>
