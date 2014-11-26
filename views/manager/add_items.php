@@ -174,7 +174,7 @@ function insertIntoDB($upc, $title, $type, $category, $company, $year, $price, $
 	 </tr>
 	 <tr>
 		 <td>Title</td>
-		 <td><input type="text" name="item_title" value="<? postValue('item_title'); ?>"></td>
+		 <td><input type="text" name="item_title" value="<?php postValue('item_title'); ?>"></td>
 	 </tr>
 	 <tr>
 		 <td>Category</td>
@@ -193,19 +193,19 @@ function insertIntoDB($upc, $title, $type, $category, $company, $year, $price, $
 	 </tr>
 	 <tr>
 		 <td>Company</td>
-		 <td><input type="text" name="item_company" value="<? postValue('item_company'); ?>"></td>
+		 <td><input type="text" name="item_company" value="<?php postValue('item_company'); ?>"></td>
 	 </tr>
 	 <tr>
 		 <td>Year</td>
-		 <td><input type="text" name="item_year" value="<? postValue('item_year'); ?>"></td>
+		 <td><input type="text" name="item_year" value="<?php postValue('item_year'); ?>"></td>
 	 </tr>
 	 <tr>
 		 <td>Price</td>
-		 <td><input type="number" name="item_price" value="<? postValue('item_price'); ?>"></td>
+		 <td><input type="number" name="item_price" value="<?php postValue('item_price'); ?>"></td>
 	 </tr>
 	 <tr>
 		 <td>Stock</td>
-		 <td><input type="text" name="item_stock" value="<? postValue('item_stock'); ?>"></td>
+		 <td><input type="text" name="item_stock" value="<?php postValue('item_stock'); ?>"></td>
 	 </tr>
 	 <tr>
 		 <td></td>
