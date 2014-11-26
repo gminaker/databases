@@ -26,10 +26,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 	
 function returned(){
-	global $error_stack;
-	global $notice_stack;
-	
-	
 	$receiptId = $_POST['receipt_id'];
 		
 	global $connection;
@@ -37,8 +33,8 @@ function returned(){
 	$stmt->bind_param("s",  $receiptId);
 	$stmt->execute();
 	    
-	if($stmt->error) {    
-		array_push($error_stack, printf("<b>Error: %s.</b>\n", $stmt->error));  
+	if($stmt->error) {       
+		printf("<b>Error: %s.</b>\n", $stmt->error);
 	}
 	     
 	$stmt->store_result();
@@ -83,9 +79,9 @@ function refundItems($total_quantities){
 	$receiptId = $_POST['receipt_id'];
 		
 	global $connection;
-	$error_stack = array();
 		
 	if(isset($_POST['return'])){
+		$error_stack = array();
 		$firstReturn = true;
 		$all_ok = true;
 		$connection->autocommit(FALSE);
@@ -147,17 +143,20 @@ function refundItems($total_quantities){
 			} else if ($qty == ""){
 				// No return attempted.
 			} else {
-				array_push($notice_stack, "Sorry, can't return %d of UPC: %s", $qty, $upc);
+				printf("<br>Sorry, can't return %d of UPC: %s.</br>", $qty, $upc);
 			}
 		}
 		if($connection->commit()) {
 			foreach($transactions as $value) {
-				array_push($notice_stack, "<br>Return processed successfully for: %d of UPC: %s on Credit Card No. %s</br>", $value['qty'], 			$value['upc'], $value['cardNo']);
+				printf("<br>Return processed successfully for: %d of UPC: %s on Credit Card No. %s</br>", $value['qty'], $value['upc'], $value['cardNo']);
 			}
 		};			
 		$connection->autocommit(TRUE);
-	}
-		
+		if(count($error_stack) > 0){
+			print("Errors occurred:");
+			print_r($error_stack);
+		}	
+	}			
 }
 	
 function checkReceiptDisplayContents(){
@@ -211,8 +210,6 @@ function checkReceiptDisplayContents(){
      
 function getAllReceiptItems($receiptId, $oldReceipt, $cardNo){
 	global $connection;
-	global $notice_stack;
-	
 	$stmt = $connection->prepare("SELECT * FROM purchaseitem WHERE pi_receiptId =  ?");
 	$stmt->bind_param("s",  $receiptId);
 	$stmt->execute();
@@ -226,7 +223,8 @@ function getAllReceiptItems($receiptId, $oldReceipt, $cardNo){
 	$stmt->bind_result($receiptId, $upc, $quantity);
 		
 	if($count == 0){
-		array_push($notice_stack,"This receipt don't have no items.");
+		print("This receipt don't have no items.");
+		exit();
 	}
 	$i=0;
 	while($stmt->fetch()){
@@ -246,8 +244,6 @@ function getAllReceiptItems($receiptId, $oldReceipt, $cardNo){
 	
 function getItemInfo($upc){
 	global $connection;
-	global $notice_stack;
-	
 	$stmt = $connection->prepare("SELECT * FROM item WHERE it_upc =  ?");
 	$stmt->bind_param("s", $upc);
 	$stmt->execute();
@@ -263,10 +259,11 @@ function getItemInfo($upc){
 	$year, $price, $stock);
 		
 	if($count == 0){
-		array_push($notice_stack, "Sorry bud, can't find that item.\n");
-	} else{
-		$stmt->fetch();
-	}
+		print("Sorry bud, can't find that item.\n");
+		exit();
+	} 
+	$stmt->fetch();
+
 	//var_dump($item_name);
 	return $item_name;
 }
@@ -283,8 +280,6 @@ function renderReceiptCollector(){
 function getPurchaseInfo($receiptId){
 	
 	global $connection;
-	global $notice_stack;
-	
 	$stmt = $connection->prepare("SELECT * FROM purchase WHERE p_receiptId =  ?");
 	$stmt->bind_param("s",  $receiptId);
 	$stmt->execute();
@@ -299,7 +294,8 @@ function getPurchaseInfo($receiptId){
 	$stmt->bind_result($receiptId, $date, $cid, $cardNo, $expiryDate, $expectedDate, $deliveredDate);
 		
 	if($count == 0){
-		array_push($notice_stack,"Sorry bud, can't find that receipt.\n");
+		print("Sorry bud, can't find that receipt.\n");
+		exit();
 	} else {
 		$stmt->fetch();
 	}

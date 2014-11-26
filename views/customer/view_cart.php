@@ -26,7 +26,9 @@
 		
 		if(isset($_POST['add_to_cart']) && $_POST['add_to_cart'] == true){
 			if(empty($_POST['cart_qty'])){
-				array_push($error_stack,  'Error: don\'t add zero to cart');
+				array_push($error_stack,  'Don\'t add zero to cart');
+			}else if($_POST['cart_qty'] < 0){
+				array_push($error_stack,  'Can\'t add negative quantities to cart');
 			}else{
 				$key = $_POST['cart_upc'];
 				$qty = $_POST['cart_qty'];
