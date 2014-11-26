@@ -140,7 +140,7 @@ function insertIntoDB($user_id, $cc_no, $cc_ex, $expected_date, $all){
     
     // Print any errors if they occured
     if($stmt->error) {       
-      array_push($error_stack, $stmt->error);
+      array_push($error_stack, $stmt->error. ' at line number '.__LINE__);
     }     
     
     $receiptId = $stmt->insert_id;
@@ -160,7 +160,7 @@ function insertIntoDB($user_id, $cc_no, $cc_ex, $expected_date, $all){
 				$stmt->execute();
 				  // Print any errors if they occured
 				if($stmt->error) {       
-				  array_push($error_stack, $stmt->error);
+				  array_push($error_stack, $stmt->error.__LINE__);
 				}    
 			}
 		}
