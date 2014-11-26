@@ -59,10 +59,12 @@
  
 function getAllOrdersToProcess(){
 	global $connection;
+	global $notice_stack;
+	
 	$results = $connection->query("SELECT * FROM purchase WHERE deliveredDate IS NULL");
  	
  	if($results->num_rows == 0){
-	 	print '<tr><td colspan=5>No orders needing delivery dates set were found.</td></tr>';
+	 	array_push($notice_stack, 'No orders needing delivery dates were found.');
  	}else{
 
 	 	$i = 0;
@@ -85,23 +87,41 @@ function getAllOrdersToProcess(){
 	$results->free();
  }
  
+ 
+ function renderProcessDeliveries(){
+	 
+	 $output = getAllOrdersToProcess();
+	 
+	 if($output){
+	 renderProcessDeliveryPrefix();
+	 $output;
+	 renderProcessDeliveryPostfix();
+	 }
+	 
+ }
+ 
+ function renderProcessDeliveryPostfix(){
+	 print '</form>
+	 		</table>';
+ }
+ 
+ function renderProcessDeliveryPrefix(){
+	 print '<h1>Process Deliveries</h1>
+ 
+			  <table border="1">
+				 <tr>
+					 <th>Receipt ID</th>
+					 <th>Date</th>
+					 <th>Customer ID</th>
+					 <th>Expected Delivery</th>
+					 <th>Actual Delivery</th>
+				 </tr>
+				 <form method="post">
+				 <input type=hidden name="updateDeliveryDates" value="SUBMIT">';
+ }
+ 
+ 
+  renderProcessDeliveries();
+  
  ?>
  
- <h1>Process Deliveries</h1>
- 
-  <table border="1">
-	 <tr>
-		 <th>Receipt ID</th>
-		 <th>Date</th>
-		 <th>Customer ID</th>
-		 <th>Expected Delivery</th>
-		 <th>Actual Delivery</th>
-	 </tr>
-	 <form method="post">
-	 <input type=hidden name="updateDeliveryDates" value="SUBMIT">
-	 
-	 <?php getAllOrdersToProcess(); ?>
-	 
-	 
-	 </form>
- </table>
