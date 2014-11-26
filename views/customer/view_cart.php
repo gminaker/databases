@@ -27,7 +27,9 @@
 		if(isset($_POST['add_to_cart']) && $_POST['add_to_cart'] == true){
 			if(empty($_POST['cart_qty'])){
 				array_push($error_stack,  'Don\'t add zero to cart');
-			}else if($_POST['cart_qty'] < 0){
+			}else if(!is_numeric($_POST['cart_qty'])){
+				array_push($error_stack, 'Please recheck quantity');
+			}else if(intval($_POST['cart_qty']) < 0){
 				array_push($error_stack,  'Can\'t add negative quantities to cart');
 			}else{
 				$key = $_POST['cart_upc'];
@@ -81,6 +83,10 @@
 		 }
 		 
 		 renderTablePostfix();
+
+		 renderBill($cart);
+
+		 renderCCInfo();
 	 
 	 }
  }
@@ -104,7 +110,30 @@
  
  
  function renderTablePostfix(){
-	print  ' </table><br /><br />
+	print  ' </table><br /><br />';
+}
+
+function renderBill($cart){
+		$costs = getCost($cart);
+
+		print '<table>
+				 <tr>
+					 <td>Subtotal: </td>
+					 <td style="text-align:right">$'.$costs['$cost'].'</td>
+				 </tr>
+				 <tr>
+					 <td>Tax: </td>
+					 <td style="text-align:right">$'.$costs['$tax'].'</td>
+				 </tr>
+				 <tr>
+					 <td>Total Due: </td>
+					 <td style="text-align:right">$'.$costs['$total'].'</td>
+				 </tr>
+			 </table>';
+}
+
+function renderCCInfo(){
+	print '
 	
 			  <h2>Ready to Checkout?</h2>
 			  <p>Just enter your credit card number below, and we will steal your money and ship <br />your order to the address that we don\'t have on file. Thanks for shopping with us!</p>
@@ -129,34 +158,70 @@
  
  function getItemRow($upc, $qty){
 	global $connection;
+	global $error_stack;
+	global $notice_stack;
+
  	$result = $connection->query("SELECT * FROM item WHERE it_upc = $upc");
  	
- 	if($result->num_rows == 0){
-	 	print '<tr><td colspan=9>No Items Found</td</tr>';
- 	}
+ 	if (!$result){
+ 		array_push($error_stack, $connection->error );
+ 	} else if($result->num_rows == 0){
+	 	array_push($notice_stack,  'No Items Found');
+ 	} else {
 
- 	$i = 0;
-	while($row = $result->fetch_assoc()) {
-	    print '<tr>';
-		    print '<td>'.$qty.'</td>';
-		    print '<input type="hidden" size="5" name="cart['.$i.'][upc]" value="'.$row["it_upc"].'">';
-		    print '<input type="hidden" size="5" name="cart['.$i.'][qty]" value="'.$qty.'">';
-		    print '<td>'.$row["it_upc"].'</td>';
-		    print '<td>'.$row["it_title"].'</td>';
-		    print '<td>'.$row["type"].'</td>';
-		    print '<td>'.$row["category"].'</td>';
-		    print '<td>'.$row["company"].'</td>';
-		    print '<td style="text-align:right">'.$row["year"].'</td>';
-		    print '<td style="text-align:right">'.$row["price"].'</td>';
-		    print '<form name="delete_item" method="post" action="">';
-		    print '<input type="hidden" name="delete_upc" value="'.$upc.'">';
-		    print '<td style="text-align:right"><input type=submit value="Delete"></td>';
-	    print '</form></tr>';
+ 		$i = 0;
+		while($row = $result->fetch_assoc()) {
+	    	print '<tr>';
+		   		print '<td>'.$qty.'</td>';
+		    	print '<input type="hidden" size="5" name="cart['.$i.'][upc]" value="'.$row["it_upc"].'">';
+		    	print '<input type="hidden" size="5" name="cart['.$i.'][qty]" value="'.$qty.'">';
+		    	print '<td>'.$row["it_upc"].'</td>';
+		    	print '<td>'.$row["it_title"].'</td>';
+		    	print '<td>'.$row["type"].'</td>';
+		    	print '<td>'.$row["category"].'</td>';
+		    	print '<td>'.$row["company"].'</td>';
+		    	print '<td style="text-align:right">'.$row["year"].'</td>';
+		    	print '<td style="text-align:right">'.$row["price"].'</td>';
+		    	print '<form name="delete_item" method="post" action="">';
+		    	print '<input type="hidden" name="delete_upc" value="'.$upc.'">';
+		    	print '<td style="text-align:right"><input type=submit value="Delete"></td>';
+	    	print '</form></tr>';
 	    
-	    $i++;
-	}  
+	    	$i++;
+		}
+	} 
 
 	$result->free();
+ }
+
+ function getCost($cart){
+ 	global $connection;
+ 	global $error_stack;
+
+
+ 	$cost = 0.0;
+
+ 	foreach($cart as $key => $value){
+		$result = $connection->query("SELECT * FROM item WHERE it_upc = $key");
+		if(!$result){
+			array_push($error_stack,  $connection->error);
+		}else if(!($result->num_rows == 0)){
+ 			while($row = $result->fetch_assoc()) {
+				$cost += intval($value) * floatval($row["price"]);
+ 		}
+
+		$result->free();
+
+ 		}
+ 	}
+
+ 	$cost = number_format($cost, 2);
+	$tax = number_format(round($cost * 0.05, 2), 2);
+	$total = number_format(($cost + round($cost*0.05, 2)), 2);
+
+	$result->free();
+
+	return array('$cost'=>$cost, '$tax'=>$tax, '$total'=>$total);
  }
  
  

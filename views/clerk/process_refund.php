@@ -7,7 +7,7 @@
 *
 * PHP version 5
 *
-* @author   Gordon
+* @author   Mike, Gordon
 * @since    1.0
 *
 */
@@ -60,17 +60,12 @@ function returned(){
 	}
 			
 	while($stmt->fetch()){
-		//var_dump($upc);
-		//var_dump($recId);
 		if (in_array($upc, $upcs)) {
-			//print("Found a return for this item.\n");
-			//var_dump($upc);
 			if (array_key_exists($upc, $total_quantities)) {
 				$total_quantities[$upc] += $qty;
 			} else {
 				$total_quantities[$upc] = $qty;
-			}
-				
+			}			
 		}
 	}
 	return $total_quantities;
@@ -82,6 +77,7 @@ function refundItems($total_quantities){
 		
 	global $connection;
 	global $error_stack;
+	global $notice_stack;
 		
 	if(isset($_POST['return'])){
 		$firstReturn = true;
@@ -92,25 +88,21 @@ function refundItems($total_quantities){
 		$n = 0;
 			
 		foreach($_POST['return'] as $key => $value) {
-			    	
-			//var_dump($value['qty']);
 			$upc = $value['upc'];
 			$purchase_qty = $value['pqty'];
 			$qty = $value['qty'];
 			if (array_key_exists($upc, $total_quantities)) {
-				//array_push($error_stack, "$total_quantities[$upc] of UPC, $upc, have/has already been returned on this receipt.");
-				printf("<br>%d of UPC, %s, have/has already been returned on this receipt.</br>", $total_quantities[$upc], $upc);
+				array_push($notice_stack, "$total_quantities[$upc] of UPC, $upc, have/has already been returned on this receipt.");
 				$not_returned_qty = $purchase_qty - $total_quantities[$upc];
 			} else {
 				$not_returned_qty = $purchase_qty;
 			}
-			// var_dump($not_returned_qty);
 					
 			if ($qty > 0 && $qty <= $not_returned_qty){
 				if ($firstReturn) {
 					$stmt = $connection->prepare("INSERT INTO returnrecord (ret_date, ret_receiptId) VALUES (?,?)");
 	    
-					// Bind the title and pub_id parameters, 'sss' indicates 3 strings
+					// Bind the statement parameters, 'ss' indicates 2 strings
 					$stmt->bind_param("ss", date('Y-m-d h:i:s', time()),$receiptId);
 	    
 					// Execute the insert statement
@@ -122,7 +114,6 @@ function refundItems($total_quantities){
 					}     
 	    
 					$returnReceiptId = $stmt->insert_id;
-					//var_dump($returnReceiptId);
 					$firstReturn = false;
 				}
 					  	
@@ -137,7 +128,8 @@ function refundItems($total_quantities){
 
 					$connection->rollback();
 					$connection->autocommit(TRUE);
-					break;
+					array_push($error_stack, "This transaction was rolled back");
+					return;
 				} else {
 					// Transaction would work add it to the array.
 					$transactions[$n] = $value;	
@@ -152,10 +144,13 @@ function refundItems($total_quantities){
 		}
 		if($connection->commit()) {
 			foreach($transactions as $value) {
-				printf("<br>Return processed successfully for: %d of UPC: %s on Credit Card No. %s</br>", $value['qty'], $value['upc'], $value['cardNo']);
+				$qty = $value['qty'];
+				$upt = $value['upc'];
+				$cardNo = $value['cardNo'];
+				array_push($notice_stack, "Return processed successfully for: $qty of UPC: $upc on Credit Card No. $cardNo");
 			}
 		};			
-		$connection->autocommit(TRUE);	
+		$connection->autocommit(TRUE);
 	}			
 }
 	
@@ -166,6 +161,9 @@ function checkReceiptDisplayContents(){
 	$oldReceipt = false;
 	$receiptId = $_POST["invoice_no"];
 	$purchase = getPurchaseInfo($receiptId);
+	if ($purchase == NULL) {
+		return;
+	}
 		
 	$r_date = new DateTime($purchase['date']);
 	$now = new DateTime();
@@ -228,7 +226,6 @@ function getAllReceiptItems($receiptId, $oldReceipt, $cardNo){
 		
 	if($count == 0){
 		array_push($error_stack,"This receipt don't have no items.");
-		exit();
 	}
 	$i=0;
 	while($stmt->fetch()){
@@ -266,11 +263,8 @@ function getItemInfo($upc){
 		
 	if($count == 0){
 		array_push($error_stack,"Sorry bud, can't find that item.");
-		exit();
 	} 
 	$stmt->fetch();
-
-	//var_dump($item_name);
 	return $item_name;
 }
 	
@@ -302,20 +296,20 @@ function getPurchaseInfo($receiptId){
 	$stmt->bind_result($receiptId, $date, $cid, $cardNo, $expiryDate, $expectedDate, $deliveredDate);
 		
 	if($count == 0){
-		array_push($error_stack,"Sorry bud, can't find that receipt.");
-		exit();
+		array_push($error_stack,"Sorry bud, can't find receipt #$receiptId.");
+		$a = NULL;
+
 	} else {
 		$stmt->fetch();
-	}
-	$a = array();
-	$a['receiptId'] = $receiptId;
-	$a['date'] = $date;
-	$a['cid'] = $cid;
-	$a['cardNo']  = $cardNo;
-	$a['expiryDate'] = $expiryDate;
-	$a['expectedDate'] = $expectedDate;
-	$a['deliveredDate'] = $deliveredDate;
-	  
+		$a = array();
+		$a['receiptId'] = $receiptId;
+		$a['date'] = $date;
+		$a['cid'] = $cid;
+		$a['cardNo']  = $cardNo;
+		$a['expiryDate'] = $expiryDate;
+		$a['expectedDate'] = $expectedDate;
+		$a['deliveredDate'] = $deliveredDate;
+	} 
 	return $a;
 }
  
