@@ -1,11 +1,16 @@
 <?php
+	global $error_stack;
 	if ($_SERVER["REQUEST_METHOD"] == "POST") {
-			if(isset($_POST["search_type"]) && $_POST['search_type'] == 'quick'){
+			if(isset($_POST["search_type"]) && $_POST['search_type'] == 'quick' and !empty($_POST['quick_search'])){
 				returnQuickSearchResults();
 			}else if(isset($_POST["search_type"]) && $_POST['search_type'] == 'advanced'){
 				returnAdvancedSearchResults();
+			} else {
+				array_push($error_stack, "Please enter search terms.");
+				returnSearchPage();
 			}
-	} else { returnSearchPage();
+	} else { 	 		
+		returnSearchPage();
 	}
 
 	function returnQuickSearchResults(){
@@ -77,6 +82,7 @@
 	
 	function returnAdvancedSearchResults(){
 		global $notice_stack;
+		global $error_stack;
 		
 		$upc = $_POST['upc'];
 		$title = $_POST['title'];
@@ -167,7 +173,7 @@
 
     		}	    
 		} else {
-			print'Error, please input something!';
+			array_push($error_stack, "Please enter search terms.");
 			returnSearchPage();
 		}
 	}
