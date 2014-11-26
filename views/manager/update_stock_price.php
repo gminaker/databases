@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Provides content and functionatilty for Managers to Add Items. 
+ * Provides content and functionatilty for Managers to Update stock and/or prices. 
  *
  * <long description>
  *
@@ -156,9 +156,6 @@ function insertIntoDB($upc, $title, $type, $category, $company, $year, $price, $
  <input type="hidden" name="submit_new_item" value="SUBMIT">
  
  <table>
-	 <tr>
-		 <td colspan="2">New Item</td>
-	 </tr>
 	 <tr>
 		 <td>UPC</td>
 		 <td><input type="text" name="item_upc" value="<?php postValue('item_upc'); ?>"></td>
