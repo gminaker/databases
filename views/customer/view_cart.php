@@ -199,12 +199,16 @@ function renderCCInfo(){
  			while($row = $result->fetch_assoc()) {
 				$cost += intval($value) * floatval($row["price"]);
  			}
+
+			$result->free();
  		}
  	}
 
  	$cost = number_format($cost, 2);
 	$tax = number_format(round($cost * 0.05, 2), 2);
 	$total = number_format(($cost + round($cost*0.05, 2)), 2);
+
+	$result->free();
 
 	return array('$cost'=>$cost, '$tax'=>$tax, '$total'=>$total);
  }
