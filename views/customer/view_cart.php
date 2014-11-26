@@ -12,6 +12,8 @@
  *
  */
  global $connection;
+ global $error_stack;
+ global $notice_stack;
  
   if ($_SERVER["REQUEST_METHOD"] == "POST") {
  		
@@ -24,7 +26,7 @@
 		
 		if(isset($_POST['add_to_cart']) && $_POST['add_to_cart'] == true){
 			if($_POST['cart_qty'] == 0){
-				print 'Error: don\'t add zero to cart';
+				array_push($error_stack,  'Error: don\'t add zero to cart');
 			}else{
 				$key = $_POST['cart_upc'];
 				$qty = $_POST['cart_qty'];
@@ -43,7 +45,7 @@
 				
 				if($proposed_cart_qty > $max){
 					$new_qty = $qty - ($proposed_cart_qty - $max);
-					print 'Sorry, we don\'t have '.$qty.' of those in stock. We\'ve added '.$new_qty.' instead.';
+					array_push($notice_stack, 'Sorry, we don\'t have '.$qty.' of those in stock. We\'ve added '.$new_qty.' instead.');
 					$qty = $new_qty;
 				}
 				
@@ -60,10 +62,63 @@
 
  
  function generateCartDisplay(){
+	 global $notice_stack;
+	 $cart = $_SESSION['cart'];
+	 
+	 if(empty($cart)){
+		 array_push($notice_stack, "No items have been added to your cart!");
+	
+	 }else{
+		 
+		 renderTablePrefix();
  	 
-	 foreach($_SESSION['cart'] as $key => $value){
-		 getItemRow($key, $value);
+		 foreach($cart as $key => $value){
+			 getItemRow($key, $value);
+		 }
+	 
 	 }
+ }
+ 
+ 
+ function renderTablePrefix(){
+	  print '<h2>Shopping Cart</h2>
+			 <table border="1" width="500px";>
+			 <tr>
+				 <th>QTY</th>
+				 <th>UPC</th>
+				 <th>Title</th>
+				 <th>Type</th>
+				 <th>Category</th>
+				 <th>Company</th>
+				 <th>Year</th>
+				 <th>Price</th>
+				 <th>Delete</th>
+			 </tr>';
+ }
+ 
+ 
+ function renderTablePostfix(){
+	print  ' </table><br /><br />
+	
+			  <h2>Ready to Checkout?</h2>
+			  <p>Just enter your credit card number below, and we will steal your money and ship <br />your order to the address that we don\'t have on file. Thanks for shopping with us!</p>
+			   <table>
+				   <form name="purchase_submit" method="post" action="?page=purchase">
+				   <input type="hidden" name="purchase_items" value="SUBMIT">
+				 <tr>
+					 <td>Credit Card Number</td>
+					 <td><input type="text" name="user_ccno"></td>
+				 </tr>
+				 <tr>
+					 <td>Credit Card Expiry</td>
+					 <td><input type=date name="user_ccex"></td>
+				 </tr>
+				 <tr>
+					 <td></td>
+					 <td><input type=submit value="Purchase Items"></td>
+				 </tr>
+				   </form>
+			 </table>';
  }
  
  function getItemRow($upc, $qty){
@@ -98,43 +153,12 @@
 	$result->free();
  }
  
+ 
+ generateCartDisplay();
  ?>
-<h2>Shopping Cart</h2>
- <table border="1" width="500px";>
-	 <tr>
-		 <th>QTY</th>
-		 <th>UPC</th>
-		 <th>Title</th>
-		 <th>Type</th>
-		 <th>Category</th>
-		 <th>Company</th>
-		 <th>Year</th>
-		 <th>Price</th>
-		 <th>Delete</th>
-	 </tr>
+
 	 
-	 <?php  if(isset($_SESSION['cart']) && is_array($_SESSION['cart'])){
-				 generateCartDisplay();
- 			}
- 	 ?>
-	 
-  </table><br /><br />
-  <h2>Ready to Checkout?</h2>
-  <p>Just enter your credit card number below, and we will steal your money and ship <br />your order to the address that we don't have on file. Thanks for shopping with us!</p>
-   <table>
-	   <form name="purchase_submit" method="post" action="?page=purchase">
-	   <input type="hidden" name="purchase_items" value="SUBMIT">
-	 <tr>
-		 <td>Credit Card Number</td>
-		 <td><input type="text" name="user_ccno"></td>
-	 </tr>
-	 <tr>
-		 <td>Credit Card Expiry</td>
-		 <td><input type=date name="user_ccex"></td>
-	 </tr>
-	 <tr>
-		 <td></td>
-		 <td><input type=submit value="Purchase Items"></td>
-	 </tr>
-	   </form>
- </table>
+
+			
+
+  
