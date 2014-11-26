@@ -77,6 +77,7 @@
 	
 	function returnAdvancedSearchResults(){
 		global $notice_stack;
+		global $error_stack;
 		
 		$upc = $_POST['upc'];
 		$title = $_POST['title'];
@@ -167,7 +168,7 @@
 
     		}	    
 		} else {
-			print'Error, please input something!';
+			array_push($error_stack, 'Error, please input something!');
 			returnSearchPage();
 		}
 	}
