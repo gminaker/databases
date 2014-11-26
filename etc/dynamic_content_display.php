@@ -48,6 +48,10 @@ function getContent(){
 		    include('views/manager/top_selling_items.php');
 		    break;
 		    
+		   case "update_stock":
+		    include('views/manager/update_stock_price.php');
+		    break;
+		    
 		  default:
 		    include('views/default.php');
 		}

@@ -105,6 +105,7 @@ function displayErrors(){
 				<h2>Managers:</h2>
 				<ul>
 				<li><a href="?page=add_items">Add Items</a></li>
+				<li><a href="?page=update_stock">Update Item</a></li>
 				<li><a href="?page=process_delivery">Process Delivery</a></li>
 				<li><a href="?page=sales_report">Daily Sales Report</a></li>
 				<li><a href="?page=top_selling_items">Top Selling Items</a></li>
