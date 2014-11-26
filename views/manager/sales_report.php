@@ -70,7 +70,7 @@ function generateDailySalesReport($raw_date){
  			if ($row["category"] != $category){
 				print '<tr>';
 		   			print '<td></td>';
-		   			print '<td>Total</td>';
+		   			print '<td>Category Total</td>';
 		    		print '<td></td>';
 		    		print '<td>'.$totalunits.'</td>';
 		    		print '<td>'.$totalvalue.'</td>';

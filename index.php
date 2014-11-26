@@ -17,6 +17,7 @@
  *
  */
  
+ 
  $error_stack = array();
  $notice_stack = array();
 
@@ -92,11 +93,10 @@ function displayErrors(){
 			<input name="quick_search" type="search" size="12">
 			<input type="submit" value="Go">
 			</form>
-			<a href="?page=advanced_search">advanced search</a>
+			<a id="advanced_search" href="?page=advanced_search">advanced search</a>
 		<?php 
 		if(isset($_SESSION['user_id'])){
 			?>
-				<p>Welcome, <?php print $_SESSION['user_id']; ?></p>
 				<h2>Customers</h2>
 				<ul>
 				<li><a href="?page=view_cart">View Cart</a></li>
