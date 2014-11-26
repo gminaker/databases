@@ -161,7 +161,7 @@ function insertIntoDB($upc, $title, $type, $category, $company, $year, $price, $
 	 </tr>
 	 <tr>
 		 <td>UPC</td>
-		 <td><input type="text" name="item_upc" value="<? postValue('item_upc'); ?>"></td>
+		 <td><input type="text" name="item_upc" value="<?php postValue('item_upc'); ?>"></td>
 	 </tr>
 	 <tr>
 		 <td>Type</td>
