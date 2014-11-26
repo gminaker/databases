@@ -25,7 +25,7 @@
 		}
 		
 		if(isset($_POST['add_to_cart']) && $_POST['add_to_cart'] == true){
-			if($_POST['cart_qty'] == 0){
+			if(empty($_POST['cart_qty'])){
 				array_push($error_stack,  'Error: don\'t add zero to cart');
 			}else{
 				$key = $_POST['cart_upc'];
@@ -45,12 +45,16 @@
 				
 				if($proposed_cart_qty > $max){
 					$new_qty = $qty - ($proposed_cart_qty - $max);
-					array_push($notice_stack, 'Sorry, we don\'t have '.$qty.' of those in stock. We\'ve added '.$new_qty.' instead.');
+					if($new_qty >0){
+						array_push($notice_stack, 'Sorry, we don\'t have '.$qty.' of those in stock. We\'ve added '.$new_qty.' instead.');
+					}
 					$qty = $new_qty;
 				}
 				
 				if(isset($_SESSION['cart'][$key])){
 					$_SESSION['cart'][$key] += $qty;
+				}else if($qty == 0){
+					array_push($error_stack, "Sorry, we're out of stock on that item and can't add it to your cart");
 				}else{
 					$_SESSION['cart'][$key] = $qty;
 				}
