@@ -189,9 +189,11 @@ function renderCCInfo(){
 	    
 	    	$i++;
 		}
+		
+		$result->free();
 	} 
 
-	$result->free();
+	
  }
 
  function getCost($cart){
@@ -218,8 +220,6 @@ function renderCCInfo(){
  	$cost = number_format($cost, 2);
 	$tax = number_format(round($cost * 0.05, 2), 2);
 	$total = number_format(($cost + round($cost*0.05, 2)), 2);
-
-	$result->free();
 
 	return array('$cost'=>$cost, '$tax'=>$tax, '$total'=>$total);
  }
