@@ -47,7 +47,11 @@
 					$qty = $new_qty;
 				}
 				
-				$_SESSION['cart'][$key] += $qty;
+				if(isset($_SESSION['cart'][$key])){
+					$_SESSION['cart'][$key] += $qty;
+				}else{
+					$_SESSION['cart'][$key] = $qty;
+				}
 
 			}
 		}
