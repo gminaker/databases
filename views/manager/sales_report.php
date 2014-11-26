@@ -13,6 +13,8 @@
  *
  */
  
+ 	global $notice_stack;
+ 	
 function generateDailySalesReport($raw_date){
 	global $connection;
 	global $notice_stack;
@@ -32,7 +34,7 @@ function generateDailySalesReport($raw_date){
 	}						
  	
  	if($results->num_rows == 0){
-	 	print('No sales records found for '.$raw_date);
+	 	array_push($notice_stack,'No sales records found for '.$raw_date);
  	} else {
  		print '<table><tr><th colspan=5>Report for: '.$date.'</th></tr>';
 	 	print '<tr>	
@@ -116,6 +118,6 @@ function generateDailySalesReport($raw_date){
  	and (!empty($_POST['report_date']))){
 	 generateDailySalesReport($_POST['report_date']);
  } else if (isset($_POST['report_date'])){
- 	print "Please select date";
+	 array_push($notice_stack, "Please Enter a Date");
  }
  ?>

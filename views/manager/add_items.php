@@ -44,9 +44,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	 
 	$msg = checkValues($upc, $title, $type, $category, $company, $year, $price, $stock); 
 	
-	if($msg){
-		printf("%s", $msg);
-	}else{
+	if(!$msg){	
 		insertIntoDB($upc, $title, $type, $category, $company, $year, $price, $stock);
 	}
 }
@@ -67,21 +65,40 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
  */
 function checkValues($upc, $title, $type, $category, $company, $year, $price, $stock){
 	
+	global $error_stack;
+	$errors = null;
+	
 	if (!is_numeric($upc) or (strlen($upc) != 12)){
-		return "Please recheck UPC";
-	} else if (strlen($title) > 40){
-		return "Title too long";
-	} else if (strlen($company) > 40){
-		return "Company name too long";
-	} else if (!is_numeric($year) or (strlen($year) != 4)){
-		return "Please recheck year";
-	} else if (!is_numeric($stock) or (intval($stock) < 0)){
-		return "Please recheck stock";
-	}else if (empty($upc) or empty($title) or empty($type) or empty($category) or empty($company) or empty($year) or empty($price) or empty($stock)){
-		return "Please fill in all fields";
-	} else {
-		return null;
+		array_push($error_stack, "Please recheck UPC");
+		$errors = true;
 	}
+	
+	if (strlen($title) > 40){
+		array_push($error_stack,"Title too long");
+		$errors = true;
+	}
+	
+	if (strlen($company) > 40){
+		array_push($error_stack, "Company name too long");
+		$errors = true;
+	} 
+	
+	if (!is_numeric($year) or (strlen($year) != 4)){
+		array_push($error_stack, "Please recheck year");
+		$errors = true;
+	} 
+	
+	if (!is_numeric($stock) or (intval($stock) < 0)){
+		array_push($error_stack, "Please recheck stock");
+		$errors = true;
+	}
+	
+	if (empty($upc) or empty($title) or empty($type) or empty($category) or empty($company) or empty($year) or empty($price) or empty($stock)){
+		array_push($error_stack, "Please fill in all fields");
+		$errors = true;
+	} 
+	
+	return $errors;
 }
 
 
@@ -103,6 +120,8 @@ function insertIntoDB($upc, $title, $type, $category, $company, $year, $price, $
 	//Since $connection was declared in another page 
 	// within the site, we call global on it
 	global $connection;
+	global $error_stack;
+	
  	$stmt = $connection->prepare("INSERT INTO item (it_upc, it_title, type, category, company, year, price, stock) 
  	VALUES (?,?,?,?,?,?,?,?)");
           
@@ -114,12 +133,19 @@ function insertIntoDB($upc, $title, $type, $category, $company, $year, $price, $
     
     // Print any errors if they occured
     if($stmt->error) {       
-      printf("<b>Error: %s.</b>\n", $stmt->error);
+      array_push($error_stack, "<b>Error: %s.</b>\n", $stmt->error);
     } else {
-      echo "<b>Successfully added ".$title."</b>";
+      array_push($notice_stack, "<b>Successfully added ".$title."</b>");
       unset($_POST);
     }      
     
+ }
+ 
+ 
+ function postValue($name){
+	 if(isset($_POST[$name])){
+		 print $_POST[$name];
+	 }
  }
 
  
@@ -135,7 +161,7 @@ function insertIntoDB($upc, $title, $type, $category, $company, $year, $price, $
 	 </tr>
 	 <tr>
 		 <td>UPC</td>
-		 <td><input type="text" name="item_upc"></td>
+		 <td><input type="text" name="item_upc" value="<? postValue('item_upc'); ?>"></td>
 	 </tr>
 	 <tr>
 		 <td>Type</td>
@@ -148,7 +174,7 @@ function insertIntoDB($upc, $title, $type, $category, $company, $year, $price, $
 	 </tr>
 	 <tr>
 		 <td>Title</td>
-		 <td><input type="text" name="item_title"></td>
+		 <td><input type="text" name="item_title" value="<? postValue('item_title'); ?>"></td>
 	 </tr>
 	 <tr>
 		 <td>Category</td>
@@ -167,22 +193,22 @@ function insertIntoDB($upc, $title, $type, $category, $company, $year, $price, $
 	 </tr>
 	 <tr>
 		 <td>Company</td>
-		 <td><input type="text" name="item_company"></td>
+		 <td><input type="text" name="item_company" value="<? postValue('item_company'); ?>"></td>
 	 </tr>
 	 <tr>
 		 <td>Year</td>
-		 <td><input type="text" name="item_year"></td>
+		 <td><input type="text" name="item_year" value="<? postValue('item_year'); ?>"></td>
 	 </tr>
 	 <tr>
 		 <td>Price</td>
-		 <td><input type="number" name="item_price"></td>
+		 <td><input type="number" name="item_price" value="<? postValue('item_price'); ?>"></td>
 	 </tr>
 	 <tr>
 		 <td>Stock</td>
-		 <td><input type="text" name="item_stock"></td>
+		 <td><input type="text" name="item_stock" value="<? postValue('item_stock'); ?>"></td>
 	 </tr>
 	 <tr>
 		 <td></td>
-		 <td><input type="submit" name="item_submit"></td>
+		 <td><input type="submit" name="item_submit" ></td>
 	 </tr>
  </table>

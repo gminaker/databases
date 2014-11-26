@@ -25,12 +25,18 @@ include_once('etc/db_connection.php');
 include_once('etc/login_functionality.php');
 include_once('etc/dynamic_content_display.php');
 
+ob_start();
+getContent(); 
+$content = ob_get_contents();
+ob_end_clean();
+
+
 function displayNotices(){
 	global $notice_stack;
 	if(is_array($notice_stack) && count($notice_stack) > 0){
 		print '<div id="notices">';
 		foreach($notice_stack as $notice){
-			print '<b>Notice:</b> ' . $notice;
+			print '<b>Notice:</b> ' . $notice . '<br />';
 			unset($notice);
 		}
 		print '</div>';
@@ -42,7 +48,7 @@ function displayErrors(){
 	if(is_array($error_stack) && count($error_stack) > 0){
 		print '<div id="errors">';
 		foreach($error_stack as $error){
-			print '<b>Error:</b> ' . $error;
+			print '<b>Error:</b> ' . $error . '<br />';;
 			unset($error);
 		}
 		print '</div>';
@@ -119,9 +125,11 @@ function displayErrors(){
 		?>
 		</div>
 		<div id="content">
-					<?php displayErrors(); ?>
-					<?php displayNotices(); ?>
-			<?php getContent(); ?>
+					<?php 
+						displayErrors(); 
+						displayNotices();
+						echo $content; ?>
+			
 		</div>
 		<div id="footer">
 			Footer Message
