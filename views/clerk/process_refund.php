@@ -111,6 +111,10 @@ function refundItems($total_quantities){
 					// Print any errors if they occured
 					if($stmt->error) {      
 						array_push($error_stack, $stmt->error);
+						$connection->rollback();
+						$connection->autocommit(TRUE);
+						array_push($error_stack, "This transaction was rolled back");
+						return;
 					}     
 	    
 					$returnReceiptId = $stmt->insert_id;
