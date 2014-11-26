@@ -68,7 +68,7 @@ function displayErrors(){
 		<script src="js/jquery-ui-1.11.2/jquery-ui.min.js"></script>
 		<script src="js/datepicker.js"></script>
 	
-		<title>Online Store V1</title>
+		<title>Online Store V2</title>
 		
 		<!--  A stylesheet to modify colours, fonts, etc. -->
 	    <link href="css/default.css" rel="stylesheet" type="text/css">
@@ -77,9 +77,15 @@ function displayErrors(){
 	<body>
 		<div id="container">
 		<div id="header">
+			
 		<h1>Online Store V2</h1>
 		</div>
 		<div id="nav">
+			<?php
+			if(isset($_SESSION['user_id'])){
+			?>
+				<p>Welcome, <?php print $_SESSION['user_id']; ?></p>
+			<?php } ?>
 			<h2>Item Search</h2>
 			<form name="item_search" method="post" action="?page=advanced_search">
 		    <input type="hidden" name="search_type" value="quick">
@@ -90,7 +96,7 @@ function displayErrors(){
 		<?php 
 		if(isset($_SESSION['user_id'])){
 			?>
-			
+				<p>Welcome, <?php print $_SESSION['user_id']; ?></p>
 				<h2>Customers</h2>
 				<ul>
 				<li><a href="?page=view_cart">View Cart</a></li>
