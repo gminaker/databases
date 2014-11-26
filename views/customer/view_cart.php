@@ -158,53 +158,68 @@ function renderCCInfo(){
  
  function getItemRow($upc, $qty){
 	global $connection;
+	global $error_stack;
+	global $notice_stack;
+
  	$result = $connection->query("SELECT * FROM item WHERE it_upc = $upc");
  	
- 	if($result->num_rows == 0){
-	 	print '<tr><td colspan=9>No Items Found</td</tr>';
- 	}
+ 	if (!$result){
+ 		array_push($error_stack, $connection->error );
+ 	} else if($result->num_rows == 0){
+	 	array_push($notice_stack,  'No Items Found');
+ 	} else {
 
- 	$i = 0;
-	while($row = $result->fetch_assoc()) {
-	    print '<tr>';
-		    print '<td>'.$qty.'</td>';
-		    print '<input type="hidden" size="5" name="cart['.$i.'][upc]" value="'.$row["it_upc"].'">';
-		    print '<input type="hidden" size="5" name="cart['.$i.'][qty]" value="'.$qty.'">';
-		    print '<td>'.$row["it_upc"].'</td>';
-		    print '<td>'.$row["it_title"].'</td>';
-		    print '<td>'.$row["type"].'</td>';
-		    print '<td>'.$row["category"].'</td>';
-		    print '<td>'.$row["company"].'</td>';
-		    print '<td style="text-align:right">'.$row["year"].'</td>';
-		    print '<td style="text-align:right">'.$row["price"].'</td>';
-		    print '<form name="delete_item" method="post" action="">';
-		    print '<input type="hidden" name="delete_upc" value="'.$upc.'">';
-		    print '<td style="text-align:right"><input type=submit value="Delete"></td>';
-	    print '</form></tr>';
+ 		$i = 0;
+		while($row = $result->fetch_assoc()) {
+	    	print '<tr>';
+		   		print '<td>'.$qty.'</td>';
+		    	print '<input type="hidden" size="5" name="cart['.$i.'][upc]" value="'.$row["it_upc"].'">';
+		    	print '<input type="hidden" size="5" name="cart['.$i.'][qty]" value="'.$qty.'">';
+		    	print '<td>'.$row["it_upc"].'</td>';
+		    	print '<td>'.$row["it_title"].'</td>';
+		    	print '<td>'.$row["type"].'</td>';
+		    	print '<td>'.$row["category"].'</td>';
+		    	print '<td>'.$row["company"].'</td>';
+		    	print '<td style="text-align:right">'.$row["year"].'</td>';
+		    	print '<td style="text-align:right">'.$row["price"].'</td>';
+		    	print '<form name="delete_item" method="post" action="">';
+		    	print '<input type="hidden" name="delete_upc" value="'.$upc.'">';
+		    	print '<td style="text-align:right"><input type=submit value="Delete"></td>';
+	    	print '</form></tr>';
 	    
-	    $i++;
-	}  
+	    	$i++;
+		}
+	} 
 
 	$result->free();
  }
 
  function getCost($cart){
  	global $connection;
+ 	global $error_stack;
+
 
  	$cost = 0.0;
 
  	foreach($cart as $key => $value){
 		$result = $connection->query("SELECT * FROM item WHERE it_upc = $key");
- 		if(!($result->num_rows == 0)){
+		if(!$result){
+			array_push($error_stack,  $connection->error);
+		}else if(!($result->num_rows == 0)){
  			while($row = $result->fetch_assoc()) {
 				$cost += intval($value) * floatval($row["price"]);
- 			}
+ 		}
+
+		$result->free();
+
  		}
  	}
 
  	$cost = number_format($cost, 2);
 	$tax = number_format(round($cost * 0.05, 2), 2);
 	$total = number_format(($cost + round($cost*0.05, 2)), 2);
+
+	$result->free();
 
 	return array('$cost'=>$cost, '$tax'=>$tax, '$total'=>$total);
  }
