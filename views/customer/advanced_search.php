@@ -9,10 +9,11 @@
 	}
 
 	function returnQuickSearchResults(){
+		global $connection;
+		global $notice_stack;
 		
 		$search_query = $_POST['quick_search'];
 
-		global $connection;
  	    $results = $connection->query("	SELECT * 
 										FROM item, leadsinger
 										WHERE ls_upc = it_upc AND 
@@ -20,9 +21,9 @@
 										OR MATCH (ls_name) AGAINST('+$search_query*' IN BOOLEAN MODE)
 										OR year like '%$search_query%');");
 	 								 
-		if(!$results) {       
+		if($results->num_rows == 0) {       
 
-	 		printf("<b>Error: please attempt again</b>");
+	 		array_push($notice_stack, "Couldn't find any matching results. Please try again.");
 	 		returnSearchPage();
 
     	} else {
@@ -47,10 +48,7 @@
 
 
 			while($row = $results->fetch_assoc()) {
-	   			print '<tr>';
-			    	
-		    		
-		    		print '<td>'.$row["it_upc"].'</td>';
+	   			print '<tr>';print '<td>'.$row["it_upc"].'</td>';
 		    		print '<td>'.$row["it_title"].'</td>';
 		    		print '<td>'.$row["type"].'</td>';
 		    		print '<td>'.$row["category"].'</td>';
@@ -78,6 +76,8 @@
 	}
 	
 	function returnAdvancedSearchResults(){
+		global $notice_stack;
+		
 		$upc = $_POST['upc'];
 		$title = $_POST['title'];
 		$item_type = $_POST['item_type'];
@@ -113,9 +113,9 @@
 											WHERE ls_upc = it_upc
 											$like;");
 
- 	    	if(!$results) {       
+ 	    	if($results->num_rows == 0) {       
 
-	 			printf("<b>Error: please attempt again</b>");
+	 			array_push($notice_stack, "Couldn't find any matching results. Please try again.");
 	 			returnSearchPage();
 
     		} else {
@@ -172,73 +172,70 @@
 		}
 	}
 
-	function returnSearchPage(){
-?>
+function returnSearchPage(){
+	?>
+	<h2>Item Search</h2>
 	
+	<h3>Quick Search:</h3>
+		<form name="item_search" method="post" action="?page=advanced_search">
+		<input type="hidden" name="search_type" value="quick">
+		<input name="quick_search" type="search" size="20">
+		<input type="submit" value="Search">
+		</form>
+		
+	<h3>Advanced Search:</h3>
+		<form name="item_search" method="post" action="?page=advanced_search">
+			<input type="hidden" name="search_type" value="advanced">
+			<table>
+				<tr>
+					<th>UPC</th>
+					<td><input type="text" name="upc"></td>
+				</tr>
+				<tr>
+					<th>Title</th>
+					<td><input type="text" name="title"></td>
+				</tr>
+				<tr>
+					<th>Type</th>
+					<td style="text-align: left">
+						<select name="item_type">
+						 	<option value="">Select...</option>
+						 	<option value="cd">CD</option>
+						 	<option value="dvd">DVD</option>
+					 	</select>
+					</td>
+				</tr>
+				<tr>
+					<th>Category</th>
+					<td style="text-align: left">
+						<select name="item_category">
+							 <option value="">Select...</option>
+							 <option value="rock">Rock</option>
+							 <option value="pop">Pop</option>
+							 <option value="rap">Rap</option>
+							 <option value="country">Country</option>
+							 <option value="classical">Classical</option>
+							 <option value="new age">New Age</option>
+							 <option value="instrumental">Instrumental</option>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<th>Year</th>
+					<td><input type="text" name="year"></td>
+				</tr>
+				<tr>
+				<tr>
+					<th>Lead Singer</th>
+					<td><input type="text" name="ls"></td>
+				</tr>
+				<tr>
+					<td></td>
+					<td style="text-align: right"><input type="submit" value="Search"></td>
+				</tr>
+			</table>
+		</form>
 	
-	
-<h2>Item Search</h2>
-
-<h3>Quick Search:</h3>
-	<form name="item_search" method="post" action="?page=advanced_search">
-	<input type="hidden" name="search_type" value="quick">
-	<input name="quick_search" type="search" size="20">
-	<input type="submit" value="Search">
-	</form>
-	
-<h3>Advanced Search:</h3>
-	<form name="item_search" method="post" action="?page=advanced_search">
-		<input type="hidden" name="search_type" value="advanced">
-		<table>
-			<tr>
-				<th>UPC</th>
-				<td><input type="text" name="upc"></td>
-			</tr>
-			<tr>
-				<th>Title</th>
-				<td><input type="text" name="title"></td>
-			</tr>
-			<tr>
-				<th>Type</th>
-				<td style="text-align: left">
-					<select name="item_type">
-					 	<option value="">Select...</option>
-					 	<option value="cd">CD</option>
-					 	<option value="dvd">DVD</option>
-				 	</select>
-				</td>
-			</tr>
-			<tr>
-				<th>Category</th>
-				<td style="text-align: left">
-					<select name="item_category">
-						 <option value="">Select...</option>
-						 <option value="rock">Rock</option>
-						 <option value="pop">Pop</option>
-						 <option value="rap">Rap</option>
-						 <option value="country">Country</option>
-						 <option value="classical">Classical</option>
-						 <option value="new age">New Age</option>
-						 <option value="instrumental">Instrumental</option>
-					</select>
-				</td>
-			</tr>
-			<tr>
-				<th>Year</th>
-				<td><input type="text" name="year"></td>
-			</tr>
-			<tr>
-			<tr>
-				<th>Lead Singer</th>
-				<td><input type="text" name="ls"></td>
-			</tr>
-			<tr>
-				<td></td>
-				<td style="text-align: right"><input type="submit" value="Search"></td>
-			</tr>
-		</table>
-	</form>
-
-<?php 
+	<?php 
 }
 ?>
