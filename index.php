@@ -21,7 +21,6 @@
  $error_stack = array();
  $notice_stack = array();
 
-phpinfo();
 
 include_once('etc/db_connection.php');
 include_once('etc/login_functionality.php');
