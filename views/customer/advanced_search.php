@@ -71,7 +71,7 @@
 
 		$like = "";
 
-		if (is_numeric($upc) and !empty($upc)){
+		if (!empty($upc) and $upc != " "){
 			$like .= " AND it_upc like '%$upc%'"; 
 		}
 		if (!empty($title) and $title != " "){
@@ -83,13 +83,14 @@
 		if (!empty($item_category)){
 			$like .= " AND category like '%$item_category%'";
 		}
-		if (is_numeric($year) and (!empty($year) or $year == 0)){
+		if ((!empty($year) or $year == 0) and $year != " "){
 			$like .= " AND year like '%$year%'";
 		}
 		if (!empty($ls) and $ls != " "){
 			$like .= " AND ls_name like '%$ls%'";
 		}
 		if (!empty($like)){
+			array_push($error_stack, $upc.$title.$item_type.$item_category.$year.$ls.$like);
 
  	    	$results = $connection->query("	SELECT * 
 											FROM item, leadsinger
