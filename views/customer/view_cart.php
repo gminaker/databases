@@ -42,25 +42,30 @@
 				}
 				
 				$result = $connection->query("SELECT * FROM item WHERE it_upc = $key");
-				$row = $result->fetch_assoc();
-				$max = $row['stock'];
 				
-				$proposed_cart_qty = $current_cart_qty + $qty;
-				
-				if($proposed_cart_qty > $max){
-					$new_qty = $qty - ($proposed_cart_qty - $max);
-					if($new_qty >0){
-						array_push($notice_stack, 'Sorry, we don\'t have '.$qty.' of those in stock. We\'ve added '.$new_qty.' instead.');
-					}
-					$qty = $new_qty;
-				}
-				
-				if(isset($_SESSION['cart'][$key])){
-					$_SESSION['cart'][$key] += $qty;
-				}else if($qty == 0){
-					array_push($error_stack, "Sorry, we're out of stock on that item and can't add it to your cart");
+				if(!$result){
+					array_push($error_stack, $connection->error);
 				}else{
-					$_SESSION['cart'][$key] = $qty;
+					$row = $result->fetch_assoc();
+					$max = $row['stock'];
+					
+					$proposed_cart_qty = $current_cart_qty + $qty;
+					
+					if($proposed_cart_qty > $max){
+						$new_qty = $qty - ($proposed_cart_qty - $max);
+						if($new_qty >0){
+							array_push($notice_stack, 'Sorry, we don\'t have '.$qty.' of those in stock. We\'ve added '.$new_qty.' instead.');
+						}
+						$qty = $new_qty;
+					}
+					
+					if(isset($_SESSION['cart'][$key])){
+						$_SESSION['cart'][$key] += $qty;
+					}else if($qty == 0){
+						array_push($error_stack, "Sorry, we're out of stock on that item and can't add it to your cart");
+					}else{
+						$_SESSION['cart'][$key] = $qty;
+					}
 				}
 			}
 		}
@@ -169,7 +174,7 @@ function renderCCInfo(){
  	$result = $connection->query("SELECT * FROM item WHERE it_upc = $upc");
  	
  	if (!$result){
- 		array_push($error_stack, $connection->error );
+ 		array_push($error_stack, $connection->error);
  	} else if($result->num_rows == 0){
 	 	array_push($notice_stack,  'No Items Found');
  	} else {

@@ -30,7 +30,7 @@ function generateDailySalesReport($raw_date){
 									GROUP BY i.it_upc, i.category, i.price;");
 									
 	if(!$results){
-		print_f("Error: %s\n", $connection->error);
+		array_push($error_stack, $connection->error);
 	}						
  	
  	if($results->num_rows == 0){

@@ -29,7 +29,7 @@ function topSellingItems($date,$count){
 									ORDER BY sum(pi.pi_quantity) DESC;");
 									
 	if(!$results){
-		array_push($error_stack, "Error: %s\n", $connection->error);
+		array_push($error_stack, $connection->error);
 	}						
 	
  	if($results->num_rows == 0){

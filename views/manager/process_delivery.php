@@ -60,10 +60,13 @@
 function renderProcessDeliveries(){
 	global $connection;
 	global $notice_stack;
+	global $error_stack;
 	
 	$results = $connection->query("SELECT * FROM purchase WHERE deliveredDate IS NULL");
  	
- 	if($results->num_rows == 0){
+ 	if(!$results){
+	 	array_push($error_stack, $connection->error);
+ 	}else if($results->num_rows == 0){
 	 	array_push($notice_stack, 'No orders needing delivery dates were found.');
  	}else{
 
