@@ -24,6 +24,7 @@
    function checkValsThenInsertIntoDB($all){
 	    global $error_stack;
 		global $notice_stack;
+		$msg = '';
  
 	   if(isset($_POST['updates'])){
 		   foreach($_POST['updates'] as $key => $value) {
@@ -31,7 +32,7 @@
 			    $receiptId = $value['receipt'];
 			    $date = $value['date'];
 
-			    $noUpdate = false;
+			    $noUpdate = true;
 			    
 				if (isset($date) && (!empty($date))){
 				  	global $connection;
@@ -41,14 +42,16 @@
 					$stmt->bind_param("ss", date('Y-m-d h:i:s', strtotime($date)), $receiptId);
 					 
 					$stmt->execute();
+
+					$msg = $msg.", ".$receiptId;
 					
 					if($stmt->error){       
 					  array_push($error_stack, $stmt->error);
 					}
 
-				}else{
-					$noUpdate = true;
-			    }
+					$noUpdate = false;
+
+				}
 			    
 			    unset($date);
 			    unset($receiptId);
@@ -58,7 +61,7 @@
 		if($noUpdate){
 			array_push($error_stack, "Please input date(s)");
 		}else if(count($error_stack) == 0){
-			array_push($notice_stack, "Delivery dates were submitted successfully!");
+			array_push($notice_stack, "Delivery dates were submitted successfully! Updated the following receipt(s): ".substr($msg, 2));
 		}
    }
  

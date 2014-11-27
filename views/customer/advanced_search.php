@@ -23,7 +23,7 @@
  	    $results = $connection->query("	SELECT * 
 										FROM item, leadsinger
 										WHERE ls_upc = it_upc AND 
-										(MATCH (it_upc, it_title, type, category, company) AGAINST ('+$search_query*' IN BOOLEAN MODE)
+										(MATCH (it_upc, it_title, company) AGAINST ('+$search_query*' IN BOOLEAN MODE)
 										OR MATCH (ls_name) AGAINST('+$search_query*' IN BOOLEAN MODE)
 										OR year like '%$search_query%');");
 
@@ -83,7 +83,7 @@
 		if (!empty($item_category)){
 			$like .= " AND category like '%$item_category%'";
 		}
-		if ((!empty($year) or $year == 0) and $year != " "){
+		if ((!empty($year) or $year == 0) and is_numeric($year)){
 			$like .= " AND year like '%$year%'";
 		}
 		if (!empty($ls) and $ls != " "){

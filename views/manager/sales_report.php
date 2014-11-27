@@ -58,13 +58,26 @@ function generateDailySalesReport($raw_date){
 			if ($i == 0){
 				$category = $row["category"];				
 			}
+			if ($row["category"] != $category){
+				print '<tr>';
+		   			print '<td></td>';
+		   			print '<td>'.$category.' Total</td>';
+		    		print '<td></td>';
+		    		print '<td style="text-align:center">'.$totalunits.'</td>';
+		    		print '<td style="text-align:right">$'.$totalvalue.'</td>';
+	    		print '</tr>';
+
+				$category = $row["category"];
+				$totalunits = 0.00;
+ 				$totalvalue = 0.00;
+	 		}
 
 		    print '<tr>';
 			    print '<td>'.$row["it_upc"].'</td>';
 			    print '<td>'.$row["category"].'</td>';
-			    print '<td>'.$row["price"].'</td>';
-			    print '<td>'.$row["sum(pi.pi_quantity)"].'</td>';
-		    	print '<td>'.$row["i.price*sum(pi.pi_quantity)"].'</td>';
+			    print '<td>$'.$row["price"].'</td>';
+			    print '<td style="text-align:center">'.$row["sum(pi.pi_quantity)"].'</td>';
+		    	print '<td style="text-align:right">$'.$row["i.price*sum(pi.pi_quantity)"].'</td>';
 	    	print '</tr>';
 	    
 	    	$totalunits += floatval($row["sum(pi.pi_quantity)"]);
@@ -72,31 +85,25 @@ function generateDailySalesReport($raw_date){
  			$gtotalunits += floatval($row["sum(pi.pi_quantity)"]);
  			$gtotalvalue += floatval($row["i.price*sum(pi.pi_quantity)"]);
 
- 			if ($row["category"] != $category){
-				print '<tr>';
-		   			print '<td></td>';
-		   			print '<td>'.$category.' Total</td>';
-		    		print '<td></td>';
-		    		print '<td>'.$totalunits.'</td>';
-		    		print '<td>'.$totalvalue.'</td>';
-	    		print '</tr>';
-
-				$category = $row["category"];
-				$totalunits = 0.00;
- 				$totalvalue = 0.00;
-	 		}
-		    
-
 	    	$i++;
 		}
 
 		if ($category != ""){
+
+			print '<tr>';
+		   		print '<td></td>';
+		   		print '<td>'.$category.' Total</td>';
+		    	print '<td></td>';
+		    	print '<td style="text-align:center">'.$totalunits.'</td>';
+		    	print '<td style="text-align:right">$'.$totalvalue.'</td>';
+	    	print '</tr>';
+
 			print '<tr>';
 				print '<td></td>';
 				print '<td>Total Daily Sales</td>';
 		    	print '<td></td>';
-		    	print '<td>'.$gtotalunits.'</td>';
-		    	print '<td>'.$gtotalvalue.'</td>';
+		    	print '<td style="text-align:center">'.$gtotalunits.'</td>';
+		    	print '<td style="text-align:right">$'.$gtotalvalue.'</td>';
 	    	print '</tr></table>';
 		} 
 	}
