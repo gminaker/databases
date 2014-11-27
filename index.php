@@ -27,6 +27,8 @@ include_once('etc/db_connection.php');
 include_once('etc/login_functionality.php');
 include_once('etc/dynamic_content_display.php');
 
+date_default_timezone_set('America/Los_Angeles');
+
 ob_start();
 getContent(); 
 $content = ob_get_contents();

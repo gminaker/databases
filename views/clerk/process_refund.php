@@ -11,16 +11,21 @@
 * @since    1.0
 *
 */
- 
-date_default_timezone_set('America/Los_Angeles');
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+	
+	$renderReceiptCollector = false;
+	$renderReceiptTable = false;
+	
 	if (isset($_POST["return_receiptno"]) && $_POST["return_receiptno"] == "true") {
 		checkReceiptDisplayContents();
 	}else if (isset($_POST["process_refund"]) && $_POST["process_refund"] == "true") {
 		refundItems(returned());
 	}
-	renderReceiptCollector();
+	
+	if($renderReceiptCollector){
+		renderReceiptCollector();
+	}
 	
 }else{
 	renderReceiptCollector();
@@ -81,6 +86,7 @@ function refundItems($total_quantities){
 	global $notice_stack;
 		
 	if(isset($_POST['return'])){
+		global $renderReceiptCollector;
 		$firstReturn = true;
 		$all_ok = true;
 		$connection->autocommit(FALSE);
@@ -161,6 +167,7 @@ function refundItems($total_quantities){
 				$upt = $value['upc'];
 				$cardNo = $value['cardNo'];
 				array_push($notice_stack, "Return processed successfully for: $qty of UPC: $upc on Credit Card No. $cardNo");
+				$renderReceiptCollector = true;
 			}
 		};			
 		$connection->autocommit(TRUE);
