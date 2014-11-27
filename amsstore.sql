@@ -3,8 +3,8 @@ drop table if exists item;
 create table item
 	(it_upc char(12) not null,
 	it_title varchar(40) not null,
-	type varchar(3) not null, -- Define our own type here
-	category char(12) not null, -- Define our own type here
+	type ENUM('dvd', 'cd') not null,
+	category ENUM('rock', 'pop', 'rap', 'country', 'classical', 'new age', 'instrumental') not null,
 	company varchar(40) not null,
 	year YEAR(4) not null,
 	price DECIMAL(10,2) not null,
@@ -56,7 +56,7 @@ create table purchase
 	p_date DATETIME not null,
 	p_cid varchar(20) not null,
 	cardNo char(16) not null,
-	expiryDate DATE null,
+	expiryDate DATE not null,
     expectedDate DATE not null,
     deliveredDate DATE null,
     PRIMARY KEY (p_receiptID),
