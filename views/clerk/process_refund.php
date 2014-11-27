@@ -102,13 +102,16 @@ function refundItems($total_quantities){
 			if ($qty > 0 && $qty <= $not_returned_qty){
 				if ($firstReturn) {
 					$stmt = $connection->prepare("INSERT INTO returnrecord (ret_date, ret_receiptId) VALUES (?,?)");
-	    
+	    			$stmt2 = $connection->prepare("UPDATE item SET stock = stock + ? WHERE it_upc = ?");
+
+
 					// Bind the statement parameters, 'ss' indicates 2 strings
 					$stmt->bind_param("ss", date('Y-m-d h:i:s', time()),$receiptId);
-	    
+	    			$stmt2->bind_param("is",$qty, $upc);
+
 					// Execute the insert statement
 					$stmt->execute();
-
+					$stmt2->execute();
 					// Print any errors if they occured
 					if($stmt->error) {      
 						array_push($error_stack, $stmt->error);
@@ -116,7 +119,12 @@ function refundItems($total_quantities){
 						$connection->autocommit(TRUE);
 						array_push($error_stack, "This transaction was rolled back");
 						return;
-					}     
+					} else if($stmt2->error){
+						array_push($error_stack, $stmt2->error.__LINE__);
+						$connection->rollback();
+						$connection->autocommit(TRUE);
+						array_push($error_stack, "This transaction was rolled back");
+					} 
 	    
 					$returnReceiptId = $stmt->insert_id;
 					$firstReturn = false;

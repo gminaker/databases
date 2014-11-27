@@ -166,10 +166,13 @@ function insertIntoDB($user_id, $cc_no, $cc_ex, $expected_date, $all){
 				if ($qty > 0){
 				  	
 					$stmt = $connection->prepare("INSERT INTO purchaseitem (pi_receiptId, pi_upc, pi_quantity) VALUES (?,?,?)");
+					$stmt2 = $connection->prepare("UPDATE item SET stock = stock - ? WHERE it_upc = ?");
 					// Bind the title and pub_id parameters, 'sss' indicates 3 strings
 					$stmt->bind_param("sss",$receiptId, $upc, $qty);
+					$stmt2->bind_param("is",$qty, $upc);
 					// Execute the insert statement
 					$stmt->execute();
+					$stmt2->execute();
 					// Print any errors if they occured
 					if($stmt->error) {       
 						array_push($error_stack, $stmt->error.__LINE__);
@@ -177,7 +180,12 @@ function insertIntoDB($user_id, $cc_no, $cc_ex, $expected_date, $all){
 						$connection->autocommit(TRUE);
 						array_push($error_stack, "This transaction was rolled back");
 						return;
-					}    
+					} else if($stmt2->error){
+						array_push($error_stack, $stmt2->error.__LINE__);
+						$connection->rollback();
+						$connection->autocommit(TRUE);
+						array_push($error_stack, "This transaction was rolled back");
+					} 
 				}
 			}
 	}
