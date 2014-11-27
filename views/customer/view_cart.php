@@ -146,7 +146,7 @@ function renderCCInfo(){
 	print '
 	
 			  <h2>Ready to Checkout?</h2>
-			  <p>Just enter your credit card number below, and we will steal your money and ship <br />your order to the address that we don\'t have on file. Thanks for shopping with us!</p>
+			  <p>Please enter your credit card information below to complete your order. Thanks for shopping with us!</p>
 			   <table>
 				   <form name="purchase_submit" method="post" action="?page=purchase">
 				   <input type="hidden" name="purchase_items" value="SUBMIT">
