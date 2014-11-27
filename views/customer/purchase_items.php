@@ -35,53 +35,22 @@
 }
 
 function calculateExpectedDate(){ 
-	$deliveries_per_day = 5;
-	$result = getMaxExpectedDate();
-
-	if ($result['count'] < $deliveries_per_day) {
-		$expectedDate = $result['expectedDate'];
-	} else {
-		$eDateTime = new DateTime($result['expectedDate']);
-		$eDateTime = $eDateTime->add(new DateInterval('P1D'));
-		$expectedDate = $eDateTime->format('Y-m-d H:i:s');
-	}
-	return $expectedDate;
-}
-
-function getMaxExpectedDate(){
-	global $error_stack;
-	
 	global $connection;
-	if ($stmt = $connection->query("SELECT expectedDate
+ 	global $error_stack;
+
+	$deliveries_per_day = 5;
+	$result = $connection->query("SELECT count(*)
 									FROM purchase
-									WHERE expectedDate =
-										(SELECT MAX(expectedDate) 
-										FROM purchase);")) {
-		$count = $stmt->num_rows;
-		
-		if($count == 0){
-			array_push($error_stack, "Sorry bud, no expected dates");
-			return 0;
-		} 
-		$row = $stmt->fetch_assoc();
-		$result = array();
-		$today = new DateTime();
-		$today->setTime ( 0, 0, 0);
-		$maxExpected = new DateTime($row['expectedDate']);
-		$maxExpected->setTime ( 0, 0, 0);
-		
-		if ($maxExpected < $today) {
-			$result['expectedDate'] = $today->format('Y-m-d H:i:s');
-			$result['count'] = 0;	
-		} else {
-			$result['expectedDate'] = $maxExpected->format('Y-m-d H:i:s');
-			$result['count'] = $count;	
-		}
-		
-		return $result;						
-	}
-	
-	return 0;
+									WHERE deliveredDate is NULL;");
+
+	if (!$result){
+ 		array_push($error_stack, $connection->error );
+ 	} else {
+ 		$row = $result->fetch_assoc();
+		$days = floor($row['count(*)'] / $deliveries_per_day);
+		$expectedDate = date('Y-m-d', strtotime('+'.$days.' days'));
+		return $expectedDate;
+ 	}
 }
 
 /**
