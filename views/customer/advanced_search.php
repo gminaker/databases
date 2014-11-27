@@ -90,8 +90,6 @@
 			$like .= " AND ls_name like '%$ls%'";
 		}
 		if (!empty($like)){
-			array_push($error_stack, $upc.$title.$item_type.$item_category.$year.$ls.$like);
-
  	    	$results = $connection->query("	SELECT * 
 											FROM item, leadsinger
 											WHERE ls_upc = it_upc

@@ -13,7 +13,8 @@
  *
  */
  
- 	global $notice_stack;
+	global $notice_stack;
+	global $error_stack;
  	
 function generateDailySalesReport($raw_date){
 	global $connection;
@@ -26,14 +27,15 @@ function generateDailySalesReport($raw_date){
 									FROM purchase p, purchaseItem pi, item i 
 									WHERE p.p_receiptId = pi.pi_receiptId
 									AND pi.pi_upc = i.it_upc
-									AND p.p_date = '$date'
-									GROUP BY i.it_upc, i.category, i.price;");
+                                    AND year(p.p_date) = year('$date')
+									AND month(p.p_date) = month('$date')
+									AND day(p.p_date) = day('$date')
+									GROUP BY i.it_upc, i.category, i.price
+									ORDER BY i.category DESC;");
 									
 	if(!$results){
 		array_push($error_stack, $connection->error);
-	}						
- 	
- 	if($results->num_rows == 0){
+	} else if($results->num_rows == 0){
 	 	array_push($notice_stack,'No sales records found for '.$raw_date);
  	} else {
  		print '<table><tr><th colspan=5>Report for: '.$date.'</th></tr>';
@@ -53,6 +55,9 @@ function generateDailySalesReport($raw_date){
  		$gtotalvalue = 0.00;
 
 		while($row = $results->fetch_assoc()) {
+			if ($i == 0){
+				$category = $row["category"];				
+			}
 
 		    print '<tr>';
 			    print '<td>'.$row["it_upc"].'</td>';
@@ -70,7 +75,7 @@ function generateDailySalesReport($raw_date){
  			if ($row["category"] != $category){
 				print '<tr>';
 		   			print '<td></td>';
-		   			print '<td>Category Total</td>';
+		   			print '<td>'.$category.' Total</td>';
 		    		print '<td></td>';
 		    		print '<td>'.$totalunits.'</td>';
 		    		print '<td>'.$totalvalue.'</td>';
@@ -118,6 +123,6 @@ function generateDailySalesReport($raw_date){
  	and (!empty($_POST['report_date']))){
 	 generateDailySalesReport($_POST['report_date']);
  } else if (isset($_POST['report_date'])){
-	 array_push($notice_stack, "Please Enter a Date");
+	 array_push($error_stack, "Please enter a date");
  }
  ?>

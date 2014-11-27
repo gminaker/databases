@@ -23,17 +23,18 @@ function topSellingItems($date,$count){
  	$results = $connection->query(" SELECT i.it_title, i.company, i.stock, sum(pi.pi_quantity)
 									FROM purchase p, purchaseItem pi, item i 
 									WHERE p.p_receiptId = pi.pi_receiptId
-									AND pi.pi_upc = i.it_upc
-									AND p.p_date = '$cleanDate'
+									AND pi.pi_upc = i.it_upc	
+                                    AND year(p.p_date) = year('$cleanDate')
+									AND month(p.p_date) = month('$cleanDate')
+									AND day(p.p_date) = day('$cleanDate')
 									GROUP BY i.it_upc, i.it_title, i.company, i.stock
 									ORDER BY sum(pi.pi_quantity) DESC;");
 									
 	if(!$results){
 		array_push($error_stack, $connection->error);
-	}						
-	
- 	if($results->num_rows == 0){
+	} else if($results->num_rows == 0){
 	 	array_push($notice_stack, 'No Items Found');
+		$results->free();
  	} else {
 		print('<table><tr><th>Top selling items on '.$cleanDate.'</th></tr></table>');
 
@@ -59,11 +60,12 @@ function topSellingItems($date,$count){
 		print('</table>');
 
 		if ($i < $count){
-			print ('<tr><td colspan=5>Only '.($i - 1).' item(s) to diplay</td></tr>');
+			print ('<tr><td colspan=5>Only '.($i - 1).' item(s) to display</td></tr>');
 		}
-	}
 
-	$results->free();
+
+		$results->free();
+	}
  }
  
  function renderTopSellingItemsPage(){
@@ -103,7 +105,7 @@ function topSellingItems($date,$count){
 		 $displayOutput = true;
 		 
 		 if(empty($_POST['report_date'])){
-			 array_push($error_stack, 'Please Enter a Valid Date');
+			 array_push($error_stack, 'Please Enter a valid date');
 			 $displayOutput = false;
 		 }
 		 

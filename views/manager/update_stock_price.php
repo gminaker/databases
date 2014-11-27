@@ -124,29 +124,34 @@ function insertIntoDB($upc, $price, $stock){
 	global $connection;
 	global $error_stack;
 	global $notice_stack;
+
+	$did = "";
 	
  	if (empty($price)){
  		$query = '	UPDATE item
 					SET stock = stock + '.$stock.'
 					WHERE it_upc = '.$upc.';';
+		$did = 'Increased stock by '.$stock.'.';
  	} else if (empty($stock)){
  		$query = '	UPDATE item
 					SET price = '.$price.'
 					WHERE it_upc = '.$upc.';';
+		$did = 'Set price to $'.number_format($price, 2).'.';
 
  	} else{
  		$query = '	UPDATE item
 					SET stock = stock +'.$stock.', price = '.$price.'
 					WHERE it_upc = '.$upc.';';
+		$did = 'Increased stock by '.$stock.'. Set price to $'.number_format($price, 2).'.';
  	}
 
  	$results = $connection->query($query);
 
     // Print any errors if they occured
-    if($connection->error) {       
+    if(!$results) {       
       array_push($error_stack, "<b>Error: %s.</b>\n", $results->error);
     } else {
-      array_push($notice_stack, "<b>Successfully updated ".$upc."</b>");
+      array_push($notice_stack, "<b>Successfully updated ".$upc.". ".$did."</b>");
       unset($_POST);
     }      
     

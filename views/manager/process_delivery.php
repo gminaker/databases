@@ -30,9 +30,12 @@
 			   
 			    $receiptId = $value['receipt'];
 			    $date = $value['date'];
+
+			    $noUpdate = false;
 			    
-				if (isset($date) && $date != ""){
+				if (isset($date) && (!empty($date))){
 				  	global $connection;
+
 					$stmt = $connection->prepare("UPDATE purchase SET deliveredDate = ? WHERE p_receiptId = ?");
 	
 					$stmt->bind_param("ss", date('Y-m-d h:i:s', strtotime($date)), $receiptId);
@@ -41,8 +44,10 @@
 					
 					if($stmt->error){       
 					  array_push($error_stack, $stmt->error);
-					}    
-			
+					}
+
+				}else{
+					$noUpdate = true;
 			    }
 			    
 			    unset($date);
@@ -50,8 +55,9 @@
 			}
 			
 		}
-		
-		if(count($error_stack) == 0){
+		if($noUpdate){
+			array_push($error_stack, "Please input date(s)");
+		}else if(count($error_stack) == 0){
 			array_push($notice_stack, "Delivery dates were submitted successfully!");
 		}
    }
