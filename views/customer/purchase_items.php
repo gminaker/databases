@@ -26,13 +26,16 @@
  
  function checkValsThenInsertIntoDB($user_id, $cc_no, $cc_ex, $all){
 	 
-	$expected_date = calculateExpectedDate();
+	
 	$error = checkValues($cc_no, $cc_ex, $all);
 	
-	$cc_ex =  substr($cc_ex, 0, 3)."01/".substr($cc_ex,4, 4);
-	$cc_ex = date("Y-m-d H:i:s", strtotime($cc_ex));
-	
 	if(!$error){
+		
+		$expected_date = calculateExpectedDate();
+	
+		$cc_ex =  substr($cc_ex, 0, 3)."01/".substr($cc_ex,4, 4);
+		$cc_ex = date("Y-m-d H:i:s", strtotime($cc_ex));
+	
 		insertIntoDB($user_id, $cc_no, $cc_ex, $expected_date, $all);
 	}
 }
