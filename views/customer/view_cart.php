@@ -69,7 +69,12 @@
  
  function generateCartDisplay(){
 	 global $notice_stack;
-	 $cart = $_SESSION['cart'];
+	 
+	 if(isset($_SESSION['cart'])){
+		 $cart = $_SESSION['cart'];
+	 }else{
+		 $cart = null;
+	 }
 	 
 	 if(empty($cart)){
 		 array_push($notice_stack, "No items have been added to your cart!");

@@ -67,6 +67,7 @@ function displayErrors(){
 		<link rel="stylesheet" href="js/jquery-ui-1.11.2/jquery-ui.min.css"  type="text/css" >
 		<script src="js/jquery-ui-1.11.2/external/jquery/jquery.js"></script>
 		<script src="js/jquery-ui-1.11.2/jquery-ui.min.js"></script>
+		<script src="js/monthpicker.js"></script>
 		<script src="js/datepicker.js"></script>
 	
 		<title>Online Store V2</title>
