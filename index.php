@@ -31,6 +31,7 @@ date_default_timezone_set('America/Los_Angeles');
 ob_start();
 getContent(); 
 $content = ob_get_contents();
+
 ob_end_clean();
 
 

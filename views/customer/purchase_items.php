@@ -29,12 +29,8 @@
 	 
 	$error = checkValues($cc_no, $cc_ex, $all); 
 	
-	$obj_date = DateTime::createFromFormat('m/Y', $cc_ex);
-	array_push($notice_stack, $cc_ex);
-	$cc_ex =  $obj_date->getTimestamp();
-	array_push($notice_stack, $cc_ex);
+	$cc_ex = "01/".$cc_ex;
 	$cc_ex = date("Y-m-d H:i:s", strtotime($cc_ex));
-	array_push($notice_stack, $cc_ex);
 	
 	if(!$error){
 		insertIntoDB($user_id, $cc_no, $cc_ex, $expected_date, $all);
