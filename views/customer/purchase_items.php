@@ -29,7 +29,8 @@
 	$error = checkValues($cc_no, &$cc_ex, $all); 
 	$expected_date = calculateExpectedDate();
 	
-	
+	$obj_date = DateTime::createFromFormat('m/Y', $cc_ex);
+	$cc_ex =  $obj_date->getTimestamp();
 	
 	if(!$error){
 		insertIntoDB($user_id, $cc_no, $cc_ex, $expected_date, $all);
