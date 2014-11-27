@@ -12,6 +12,7 @@
  *
  */
  date_default_timezone_set('America/Los_Angeles');
+ 
  if($_SERVER["REQUEST_METHOD"] == "POST") {
  		
       if (isset($_POST["purchase_items"]) && $_POST["purchase_items"] == "SUBMIT") {
@@ -24,10 +25,9 @@
  
  
  function checkValsThenInsertIntoDB($user_id, $cc_no, $cc_ex, $all){
- 	 global $notice_stack;
- 
 	 
-	$error = checkValues($cc_no, $cc_ex, $all); 
+	$expected_date = calculateExpectedDate();
+	$error = checkValues($cc_no, $cc_ex, $all);
 	
 	$cc_ex =  substr($cc_ex, 0, 3)."01/".substr($cc_ex,4, 4);
 	$cc_ex = date("Y-m-d H:i:s", strtotime($cc_ex));
@@ -195,34 +195,34 @@ function insertIntoDB($user_id, $cc_no, $cc_ex, $expected_date, $all){
  				 </tr>
  			 </table>';
  }
- 
+
  function getCost($cart){
- 	global $connection;
- 	global $error_stack;
+	 global $connection;
+	 global $error_stack;
 
+	 $cost = 0.0;
 
- 	$cost = 0.0;
+	 foreach($cart as $key => $value){
+		 $upc = $value['upc'];
 
- 	foreach($cart as $key => $value){
-		$result = $connection->query("SELECT * FROM item WHERE it_upc = $key");
-		
-		if(!$result){
-			array_push($error_stack,  $connection->error);
-		}else if(!($result->num_rows == 0)){
- 			while($row = $result->fetch_assoc()) {
-				$cost += intval($value) * floatval($row["price"]);
- 		}
+		 $result = $connection->query("SELECT * FROM item WHERE it_upc = $upc");
 
-		$result->free();
- 		}
- 	}
+		 if(!$result){
+			 array_push($error_stack,  $connection->error);
+		 }else if(!($result->num_rows == 0)){
+			 while($row = $result->fetch_assoc()) {
+				 $cost += intval($value['qty']) * floatval($row["price"]);
+			 }
+			 $result->free();
+		 }
+	 }
 
- 	$cost = number_format($cost, 2);
-	$tax = number_format(round($cost * 0.05, 2), 2);
-	$total = number_format(($cost + round($cost*0.05, 2)), 2);
-
-	return array('$cost'=>$cost, '$tax'=>$tax, '$total'=>$total);
+	 $cost = number_format($cost, 2);
+	 $tax = number_format(round($cost * 0.05, 2), 2);
+	 $total = number_format(($cost + round($cost*0.05, 2)), 2);
+	 return array('$cost'=>$cost, '$tax'=>$tax, '$total'=>$total);
  }
+ 
  function getAllReceiptItems($receiptId){
  	global $connection;
  	global $error_stack;
