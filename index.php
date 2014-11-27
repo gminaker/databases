@@ -72,7 +72,7 @@ function displayErrors(){
 		<script src="js/monthpicker.js"></script>
 		<script src="js/datepicker.js"></script>
 	
-		<title>Online Store V2</title>
+		<title>AMS Online Store</title>
 		
 		<!--  A stylesheet to modify colours, fonts, etc. -->
 	    <link href="css/default.css" rel="stylesheet" type="text/css">
@@ -82,7 +82,7 @@ function displayErrors(){
 		<div id="container">
 		<div id="header">
 			
-		<h1>Online Store V2</h1>
+		<h1>AMS Online Store</h1>
 		</div>
 		<div id="nav">
 			<?php
@@ -142,7 +142,7 @@ function displayErrors(){
 			
 		</div>
 		<div id="footer">
-			Footer Message
+			&copy; AMS Online Store 2014
 		</div>
 		</div>
 	</body>
