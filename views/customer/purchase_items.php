@@ -11,6 +11,7 @@
  * @since     1.0
  *
  */
+ date_default_timezone_set('America/Los_Angeles');
  
  if($_SERVER["REQUEST_METHOD"] == "POST") {
  		
@@ -36,11 +37,13 @@
 function calculateExpectedDate(){ 
 	$deliveries_per_day = 5;
 	$result = getMaxExpectedDate();
-	
+
 	if ($result['count'] < $deliveries_per_day) {
 		$expectedDate = $result['expectedDate'];
 	} else {
-		$expectedDate = $result['expectedDate']->add(new DateInterval('P1D'));
+		$eDateTime = new DateTime($result['expectedDate']);
+		$eDateTime = $eDateTime->add(new DateInterval('P1D'));
+		$expectedDate = $eDateTime->format('Y-m-d H:i:s');
 	}
 	return $expectedDate;
 }
@@ -51,19 +54,22 @@ function getMaxExpectedDate(){
 	global $connection;
 	if ($stmt = $connection->query("SELECT expectedDate
 									FROM purchase
-									WHERE expectedDate = (
-									SELECT MAX(expectedDate) 
-									FROM purchase);")) {
+									WHERE expectedDate =
+										(SELECT MAX(expectedDate) 
+										FROM purchase);")) {
 		$count = $stmt->num_rows;
-		//var_dump($count);
+		
 		if($count == 0){
 			array_push($error_stack, "Sorry bud, no expected dates");
-			exit();
+			return 0;
 		} 
 		$row = $stmt->fetch_assoc();
 		$result = array();
 		$today = new DateTime();
+		$today->setTime ( 0, 0, 0);
 		$maxExpected = new DateTime($row['expectedDate']);
+		$maxExpected->setTime ( 0, 0, 0);
+		
 		if ($maxExpected < $today) {
 			$result['expectedDate'] = $today->format('Y-m-d H:i:s');
 			$result['count'] = 0;	
@@ -178,7 +184,7 @@ function insertIntoDB($user_id, $cc_no, $cc_ex, $expected_date, $all){
 	
 	$connection->commit();
 	$connection->autocommit(TRUE);
-	
+	$_SESSION['cart'] = NULL; //TODO: IS THIS OK???????
 	if(empty($error_stack) || $receiptId){
 		renderReceipt($receiptId, $all);
 	}         
@@ -315,7 +321,7 @@ function insertIntoDB($user_id, $cc_no, $cc_ex, $expected_date, $all){
  
  function renderTablePrefix($receiptId){
 	 $border = "1";
-	 $width = "500px";
+	 $width = "100%";
 	  print "<h2>Receipt #$receiptId</h2>
 			 <table border=$border width=$width;>
 			 <tr>

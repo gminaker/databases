@@ -94,7 +94,7 @@
  
  function renderTablePrefix(){
 	  print '<h2>Shopping Cart</h2>
-			 <table border="1" width="500px";>
+			 <table border="1" width="100%";>
 			 <tr>
 				 <th>QTY</th>
 				 <th>UPC</th>

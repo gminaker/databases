@@ -12,7 +12,8 @@
 *
 */
  
- 
+date_default_timezone_set('America/Los_Angeles');
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	if (isset($_POST["return_receiptno"]) && $_POST["return_receiptno"] == "true") {
 		checkReceiptDisplayContents();
