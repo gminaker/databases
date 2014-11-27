@@ -57,8 +57,8 @@ create table purchase
 	p_cid varchar(20) not null,
 	cardNo char(16) not null,
 	expiryDate DATE null,
-    expectedDate DATETIME not null,
-    deliveredDate DATETIME null,
+    expectedDate DATE not null,
+    deliveredDate DATE null,
     PRIMARY KEY (p_receiptID),
     FOREIGN KEY (p_cid) REFERENCES customer(cid)
     );
