@@ -71,7 +71,7 @@
 
 		$like = "";
 
-		if (is_numeric($upc) and !empty($upc)){
+		if (!empty($upc) and $upc != " "){
 			$like .= " AND it_upc like '%$upc%'"; 
 		}
 		if (!empty($title) and $title != " "){
