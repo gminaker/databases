@@ -19,9 +19,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		checkReceiptDisplayContents();
 	}else if (isset($_POST["process_refund"]) && $_POST["process_refund"] == "true") {
 		refundItems(returned());
-	}else {
-		renderReceiptCollector();
 	}
+	renderReceiptCollector();
+	
 }else{
 	renderReceiptCollector();
 }
