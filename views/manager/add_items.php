@@ -73,6 +73,16 @@ function checkValues($upc, $title, $type, $category, $company, $year, $price, $s
 		$errors = true;
 	}
 	
+	if ($type != "dvd" && $type != "cd"){
+		array_push($error_stack, "Please recheck Type");
+		$errors = true;
+	}
+	
+	if ($category == ""){
+		array_push($error_stack, "Please enter a valid category");
+		$errors = true;
+	}
+	
 	if (strlen($title) > 40){
 		array_push($error_stack,"Title too long");
 		$errors = true;

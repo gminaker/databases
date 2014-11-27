@@ -7,4 +7,5 @@ global $error_stack;
 if (mysqli_connect_errno()) {
 	array_push($error_stack, mysqli_connect_error());
 }
+
 ?>

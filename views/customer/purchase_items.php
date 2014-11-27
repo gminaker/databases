@@ -26,8 +26,10 @@
  
  function checkValsThenInsertIntoDB($user_id, $cc_no, $cc_ex, $all){
 	 
-	$error = checkValues($cc_no, $cc_ex, $all); 
+	$error = checkValues($cc_no, &$cc_ex, $all); 
 	$expected_date = calculateExpectedDate();
+	
+	
 	
 	if(!$error){
 		insertIntoDB($user_id, $cc_no, $cc_ex, $expected_date, $all);
@@ -68,6 +70,10 @@ function checkValues($cc_no, $cc_ex, $all){
 	global $error_stack;
 	
 	$errors = false;
+	
+	if(isset($cc_ex)){
+		$cc_ex = date("Y-m-d H:i:s", strtotime($cc_ex));
+	}
 	
 	if(empty($cc_no)){
 		array_push($error_stack, 'Please go back enter a credit card number.');
