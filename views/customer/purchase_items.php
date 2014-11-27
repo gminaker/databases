@@ -187,7 +187,7 @@ function insertIntoDB($user_id, $cc_no, $cc_ex, $expected_date, $all){
  					 <td style="text-align:right">$'.$costs['$tax'].'</td>
  				 </tr>
  				 <tr>
- 					 <td>Total Due: </td>
+ 					 <td>Total Charged: </td>
  					 <td style="text-align:right">$'.$costs['$total'].'</td>
  				 </tr>
  			 </table>';
