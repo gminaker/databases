@@ -146,7 +146,7 @@ function renderCCInfo(){
 				 </tr>
 				 <tr>
 					 <td>Credit Card Expiry</td>
-					 <td><input type=date name="user_ccex"></td>
+					 <td><input type="text" class="monthpicker" name="user_ccex" placeholder="MM/YYYY"></td>
 				 </tr>
 				 <tr>
 					 <td></td>
