@@ -15,6 +15,7 @@
 
 	function returnQuickSearchResults(){
 		global $connection;
+		global $error_stack;
 		global $notice_stack;
 		
 		$search_query = $_POST['quick_search'];
@@ -25,8 +26,13 @@
 										(MATCH (it_upc, it_title, type, category, company) AGAINST ('+$search_query*' IN BOOLEAN MODE)
 										OR MATCH (ls_name) AGAINST('+$search_query*' IN BOOLEAN MODE)
 										OR year like '%$search_query%');");
-	 								 
-		if($results->num_rows == 0) {       
+
+ 	    if (!$results){
+
+	 		array_push($error_stack, $connection->error);
+	 		returnSearchPage();
+
+ 	    }else if($results->num_rows == 0) {       
 
 	 		array_push($notice_stack, "Couldn't find any matching results. Please try again.");
 	 		returnSearchPage();
@@ -54,6 +60,7 @@
 	function returnAdvancedSearchResults(){
 		global $notice_stack;
 		global $error_stack;
+		global $connection;
 		
 		$upc = $_POST['upc'];
 		$title = $_POST['title'];
@@ -84,13 +91,17 @@
 		}
 		if (!empty($like)){
 
-			global $connection;
  	    	$results = $connection->query("	SELECT * 
 											FROM item, leadsinger
 											WHERE ls_upc = it_upc
 											$like;");
 
- 	    	if($results->num_rows == 0) {       
+ 	    	if (!$results){
+
+	 			array_push($error_stack, $connection->error);
+	 			returnSearchPage();
+
+  	    	} else if($results->num_rows == 0) {       
 
 	 			array_push($notice_stack, "Couldn't find any matching results. Please try again.");
 	 			returnSearchPage();
