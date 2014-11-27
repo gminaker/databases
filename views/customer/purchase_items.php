@@ -163,14 +163,14 @@ function insertIntoDB($user_id, $cc_no, $cc_ex, $expected_date, $all){
 	$connection->autocommit(TRUE);
 	$_SESSION['cart'] = NULL; //TODO: IS THIS OK???????
 	if(empty($error_stack) || $receiptId){
-		renderReceipt($receiptId, $all);
+		renderReceipt($receiptId, $all, $expected_date);
 	}         
  }
  
- function renderReceipt($receiptId){
+ function renderReceipt($receiptId, $all, $expected_date){
 	 renderTablePrefix($receiptId);
 	 $cart = getAllReceiptItems($receiptId);
-	 renderTablePostfix();
+	 renderTablePostfix($expected_date);
 	 renderBill($cart);
  }
  
@@ -235,7 +235,7 @@ function insertIntoDB($user_id, $cc_no, $cc_ex, $expected_date, $all){
  	$stmt->bind_result($receiptId, $upc, $qty);
 		
  	if($count == 0){
- 		array_push($error_stack,"This receipt don't have no items.");
+ 		array_push($error_stack,"This receipt doesn't have any items.");
 		return NULL;
  	}
  	$i=0;
@@ -258,6 +258,7 @@ function insertIntoDB($user_id, $cc_no, $cc_ex, $expected_date, $all){
 	    	print '<td style="text-align:right">'.$row["price"].'</td></tr>';
  		$i++;
  	}
+ 	print  '</table>';
 	return $cart;
  }
  
@@ -314,6 +315,11 @@ function insertIntoDB($user_id, $cc_no, $cc_ex, $expected_date, $all){
  }
  
  
- function renderTablePostfix(){
+ function renderTablePostfix($expected_date){
+ 	print  '<table>';
+ 	print '<tr>';
+ 		print '<td>Please expect delivery of items by approximately: </td>';
+ 		print '<td>'.$expected_date.'</td>';
+ 	print '</tr>';
 	print  ' </table><br /><br />';
 }
