@@ -27,6 +27,7 @@
  function checkValsThenInsertIntoDB($user_id, $cc_no, $cc_ex, $all){
 	 
 	$expected_date = calculateExpectedDate();
+	$error = checkValues($cc_no, $cc_ex, $all);
 	
 	$cc_ex = "01/".$cc_ex;
 	$cc_ex = date("Y-m-d H:i:s", strtotime($cc_ex));
